@@ -1,12 +1,12 @@
 import React, { Component } from "react";
 import PropTypes from 'prop-types';
-import "./Rating.css"; 
+import "./Rating.css";
 
 class Rating extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            rating: 0,        
+            rating: 0,
             error: ""
         };
     }
@@ -57,7 +57,10 @@ class Rating extends Component {
                 </div>
 
                 {/* Error message */}
-                {error && <div className="error-message">{error}</div>}
+                {error && (
+                    // eslint-disable-next-line no-unused-expressions
+                    <div className="error-message">{error}</div>
+                )}
 
                 {/* Submit button */}
                 <button
@@ -65,8 +68,8 @@ class Rating extends Component {
                     style={{
                         padding: '10px 20px',
                         fontSize: '16px',
-                        backgroundColor: '#003f5c',  
-                        color: '#fff',  
+                        backgroundColor: '#003f5c',
+                        color: '#fff',
                         border: 'none',
                         borderRadius: '5px',
                         cursor: 'pointer'
