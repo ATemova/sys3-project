@@ -1,5 +1,4 @@
 import React from "react";
-import PropTypes from 'prop-types';
 import axios from "axios";
 import { API_URL } from "../Utils/Configuration";
 
@@ -22,21 +21,22 @@ class LoginView extends React.Component {
 
   componentDidMount() {
     // Check if there are stored credentials
-    const storedUser = localStorage.getItem('user');
+    const storedUsername = localStorage.getItem('username');
+    const storedPassword = localStorage.getItem('password');
     const storedRememberMe = localStorage.getItem('remember_me');
 
-    if (storedUser && storedRememberMe) {
+    if (storedUsername && storedPassword && storedRememberMe) {
       this.setState({
-        user: JSON.parse(storedUser),
         user_input: {
-          ...this.state.user_input,
+          username: storedUsername,
+          password: storedPassword,
           remember_me: JSON.parse(storedRememberMe)
         }
       });
     }
   }
 
-  QGetTextFromField(e) {
+  QGetTextFromField = (e) => {
     this.setState({
       user_input: {
         ...this.state.user_input,
@@ -45,7 +45,7 @@ class LoginView extends React.Component {
     });
   }
 
-  QToggleCheckbox(e) {
+  QToggleCheckbox = (e) => {
     this.setState({
       user_input: {
         ...this.state.user_input,
@@ -70,11 +70,13 @@ class LoginView extends React.Component {
 
           if (remember_me) {
             // Store user data in local storage
-            localStorage.setItem('user', JSON.stringify(response.data.user));
+            localStorage.setItem('username', username);
+            localStorage.setItem('password', password);
             localStorage.setItem('remember_me', JSON.stringify(remember_me));
           } else {
             // Clear user data from local storage
-            localStorage.removeItem('user');
+            localStorage.removeItem('username');
+            localStorage.removeItem('password');
             localStorage.removeItem('remember_me');
           }
         } else {
@@ -109,7 +111,6 @@ class LoginView extends React.Component {
               value={user_input.password}
               id="exampleInputPassword1" />
           </div>
-          {/* Add checkbox to the form. Use bootstrap to do it. */}
           <div className="form-check">
             <input className="form-check-input"
               type="checkbox"
@@ -124,10 +125,9 @@ class LoginView extends React.Component {
             </label>
           </div>
         </form>
-        <button style={{ margin: "10px", backgroundColor: '#003f5c', borderColor: '#003f5c' }} onClick={() => this.QPostLogin()}
+        <button style={{ margin: "10px", backgroundColor: '#003f5c', borderColor: '#003f5c' }} onClick={this.QPostLogin}
           className="btn btn-primary bt" >Sign In</button>
 
-        {/* Display error or success message */}
         {status.success === true &&
           <p className="alert alert-success" role="alert">
             {status.msg}
