@@ -28,7 +28,6 @@ class SignupView extends React.Component {
   }
 
   QPostSignup = () => {
-    // Validate the data before sending it to the server
     const { username, email, password } = this.state.user_input;
     if (!username || !email || !password) {
       this.setState({
@@ -40,7 +39,7 @@ class SignupView extends React.Component {
       return;
     }
 
-    axios.post(API_URL + '/users/register', {
+    axios.post(`${API_URL}/users/register`, {
       username,
       email,
       password
@@ -58,6 +57,11 @@ class SignupView extends React.Component {
               password: ""
             }
           });
+
+          // Store user data in local storage to enable auto-login
+          localStorage.setItem('username', username);
+          localStorage.setItem('password', password);
+          localStorage.setItem('remember_me', JSON.stringify(true));
         } else {
           this.setState({
             status: {
@@ -87,7 +91,7 @@ class SignupView extends React.Component {
         <form style={{ margin: "20px" }} >
           <div className="mb-3">
             <label className="form-label">Username</label>
-            <input name="username" onChange={(e) => this.QGetTextFromField(e)}
+            <input name="username" onChange={this.QGetTextFromField}
               value={this.state.user_input.username}
               type="text"
               className="form-control"
@@ -96,7 +100,7 @@ class SignupView extends React.Component {
           </div>
           <div className="mb-3">
             <label className="form-label">Email address</label>
-            <input name="email" onChange={(e) => this.QGetTextFromField(e)}
+            <input name="email" onChange={this.QGetTextFromField}
               value={this.state.user_input.email}
               type="email"
               className="form-control"
@@ -108,17 +112,16 @@ class SignupView extends React.Component {
           </div>
           <div className="mb-3">
             <label className="form-label">Password</label>
-            <input name="password" onChange={(e) => this.QGetTextFromField(e)}
+            <input name="password" onChange={this.QGetTextFromField}
               value={this.state.user_input.password}
               type="password"
               className="form-control"
               id="exampleInputPassword1" />
           </div>
         </form>
-        <button style={{ margin: "10px", backgroundColor: '#003f5c', borderColor: '#003f5c' }} onClick={() => this.QPostSignup()}
+        <button style={{ margin: "10px", backgroundColor: '#003f5c', borderColor: '#003f5c' }} onClick={this.QPostSignup}
           className="btn btn-primary bt" >Submit</button>
 
-        {/* Display error or success message */}
         {status.success ?
           <p className="alert alert-success"
             role="alert">{status.msg}</p> : null}
