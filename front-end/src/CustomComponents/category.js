@@ -84,21 +84,63 @@ class Category extends React.Component {
                             "Biotic Globalisation in Oceans", "Marine Ecotoxicology", "Conservation Ecology of Marine Mammals", "Ecophysiology of Marine Animals", "Field Practicum", "Biological Monitoring", 
                             "Biology and Conservation of Large Vertebrates", "Wildlife Health", "Laboratory Practicum", "Multivariate Statistics in Ecology and Nature Conservation"]
                     },
-
+                },
+                "UP FHŠ": {
+                    "Bachelor degree": {
+                        "Waiting for more updates": []
+                    },
+                    "Master degree": {
+                        "Waiting for more updates": []
+                    }
+                },
+                "UP FM": {
+                    "Bachelor degree": {
+                        "Waiting for more updates": []
+                    },
+                    "Master degree": {
+                        "Waiting for more updates": []
+                    }
+                },
+                "UP FTŠ": {
+                    "Bachelor degree": {
+                        "Waiting for more updates": []
+                    },
+                    "Master degree": {
+                        "Waiting for more updates": []
+                    }
+                },
+                "UP FVZ": {
+                    "Bachelor degree": {
+                        "Waiting for more updates": []
+                    },
+                    "Master degree": {
+                        "Waiting for more updates": []
+                    }
+                },
+                "UP PEF": {
+                    "Bachelor degree": {
+                        "Waiting for more updates": []
+                    },
+                    "Master degree": {
+                        "Waiting for more updates": []
+                    }
                 },
             }
         };
     }
 
     handleClick = (category) => {
+        console.log("Category selected:", category);
         this.setState({ selectedCategory: category, selectedSubcategory: null, selectedDeeperSubcategory: null });
     };
 
     handleSubcategoryClick = (subcategory) => {
+        console.log("Subcategory selected:", subcategory);
         this.setState({ selectedSubcategory: subcategory, selectedDeeperSubcategory: null });
     };
 
     handleDeeperSubcategoryClick = (deeperSubcategory) => {
+        console.log("Deeper subcategory selected:", deeperSubcategory);
         this.setState({ selectedDeeperSubcategory: deeperSubcategory });
     };
 
@@ -120,7 +162,7 @@ class Category extends React.Component {
             <div style={{ textAlign: "center" }}>
                 {!selectedCategory ? (
                     <>
-                        <h1>Explore the UP FAMNIT library</h1>
+                        <h1>Choose one of the libraries below</h1>
                         <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center" }}>
                             {Object.keys(subcategories).map((category) => (
                                 <div key={category} style={{ margin: "10px 5px", width: "calc(100% / 3 - 20px)" }}>
@@ -149,21 +191,25 @@ class Category extends React.Component {
                         <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center" }}>
                             {Object.keys(subcategories[selectedCategory]).map((subcategory) => (
                                 <div key={subcategory} style={{ margin: "10px 5px", width: "calc(100% / 3 - 20px)" }}>
-                                    <button
-                                        className="btn btn-secondary"
-                                        style={{
-                                            width: "100%",
-                                            padding: "10px",
-                                            fontSize: "16px",
-                                            backgroundColor: "#003f5c",
-                                            border: "2px solid #003f5c",
-                                            color: "#ffffff",
-                                            borderRadius: "5px"
-                                        }}
-                                        onClick={() => this.handleSubcategoryClick(subcategory)}
-                                    >
-                                        {subcategory}
-                                    </button>
+                                    {subcategory === "Waiting for more updates" ? (
+                                        <p style={{ color: "red", fontWeight: "bold" }}>Waiting for more updates</p>
+                                    ) : (
+                                        <button
+                                            className="btn btn-secondary"
+                                            style={{
+                                                width: "100%",
+                                                padding: "10px",
+                                                fontSize: "16px",
+                                                backgroundColor: "#003f5c",
+                                                border: "2px solid #003f5c",
+                                                color: "#ffffff",
+                                                borderRadius: "5px"
+                                            }}
+                                            onClick={() => this.handleSubcategoryClick(subcategory)}
+                                        >
+                                            {subcategory}
+                                        </button>
+                                    )}
                                 </div>
                             ))}
                         </div>
@@ -190,21 +236,25 @@ class Category extends React.Component {
                         <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center" }}>
                             {Object.keys(subcategories[selectedCategory][selectedSubcategory]).map((deeperSubcategory) => (
                                 <div key={deeperSubcategory} style={{ margin: "10px 5px", width: "calc(100% / 3 - 20px)" }}>
-                                    <button
-                                        className="btn btn-secondary"
-                                        style={{
-                                            width: "100%",
-                                            padding: "10px",
-                                            fontSize: "16px",
-                                            backgroundColor: "#003f5c",
-                                            border: "2px solid #003f5c",
-                                            color: "#ffffff",
-                                            borderRadius: "5px"
-                                        }}
-                                        onClick={() => this.handleDeeperSubcategoryClick(deeperSubcategory)}
-                                    >
-                                        {deeperSubcategory}
-                                    </button>
+                                    {deeperSubcategory === "Waiting for more updates" ? (
+                                        <p style={{ color: "red", fontWeight: "bold" }}>Waiting for more updates</p>
+                                    ) : (
+                                        <button
+                                            className="btn btn-secondary"
+                                            style={{
+                                                width: "100%",
+                                                padding: "10px",
+                                                fontSize: "16px",
+                                                backgroundColor: "#003f5c",
+                                                border: "2px solid #003f5c",
+                                                color: "#ffffff",
+                                                borderRadius: "5px"
+                                            }}
+                                            onClick={() => this.handleDeeperSubcategoryClick(deeperSubcategory)}
+                                        >
+                                            {deeperSubcategory}
+                                        </button>
+                                    )}
                                 </div>
                             ))}
                         </div>
@@ -229,7 +279,7 @@ class Category extends React.Component {
                     <>
                         <h3>Books for {selectedDeeperSubcategory} in {selectedSubcategory} of {selectedCategory}:</h3>
                         <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center" }}>
-                            {this.state.subcategories[selectedCategory][selectedSubcategory][selectedDeeperSubcategory].map((book, index) => (
+                            {subcategories[selectedCategory][selectedSubcategory][selectedDeeperSubcategory].map((book) => (
                                 <div key={book} style={{ margin: "10px 5px", width: "calc(100% / 3 - 20px)" }}>
                                     <button
                                         className="btn btn-secondary"
