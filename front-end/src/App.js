@@ -1,10 +1,9 @@
 import { Component } from "react";
-import { HOME, CATEGORY, BOOKS, COMMENTS, RATING, SIGNUP, LOGIN, LOGOUT } from "./Utils/Constants"
+import { HOME, CATEGORY, BOOKS, COMMENTS, SIGNUP, LOGIN, LOGOUT } from "./Utils/Constants"
 import Home from "./CustomComponents/home";
 import Category from "./CustomComponents/category";
 import Books from "./CustomComponents/books";
 import Comments from "./CustomComponents/comments";
-import Rating from "./CustomComponents/rating";
 import SignupView from "./CustomComponents/SignupView";
 import LoginView from "./CustomComponents/LoginView";
 import axios from "axios";
@@ -37,8 +36,6 @@ class App extends Component {
         return <Comments />;
       case BOOKS:
         return <Books />;
-      case RATING:
-        return <Rating QIDFromChild={this.QSetView} />;
       case SIGNUP:
         return <SignupView />;
       case LOGIN:
@@ -115,16 +112,6 @@ class App extends Component {
                       href="#"
                     >
                       Comments
-                    </a>
-                  </li>
-
-                  <li className="nav-item">
-                    <a
-                      onClick={this.QSetView.bind(this, { page: RATING })}
-                      className="nav-link "
-                      href="#"
-                    >
-                      Rating
                     </a>
                   </li>
 
