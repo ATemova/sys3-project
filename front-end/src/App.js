@@ -15,7 +15,7 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      CurrentPage: HOME,
+      CurrentPage: LOGIN,
       Novica: 1,
       status: {
         success: null,
