@@ -28,7 +28,7 @@ class Comments extends React.Component {
     console.log(this.state);
   };
 
-  QFileUplad = (e) => {
+  QFileUpload = (e) => {
     this.setState({
       novica: {
         ...this.state.novica,
@@ -71,14 +71,14 @@ class Comments extends React.Component {
   render() {
     const { success, msg } = this.state.status;
     return (
-      <div className="card" style={{ margin: "10px" }}>
+      <div className="card" style={{ margin: "10px", minHeight: "50vh", padding: "20px" }}>
         <h3 style={{ margin: "10px" }}>Welcome user</h3>
         <div className="mb-3" style={{ margin: "10px" }}>
           <label className="form-label">Title of the comment</label>
           <input
             name="title"
             type="text"
-            onChange={this.QGetTextFromField.bind(this)}
+            onChange={this.QGetTextFromField}
             className="form-control"
             placeholder="Title of the comment"
           />
@@ -89,7 +89,7 @@ class Comments extends React.Component {
             name="text"
             className="form-control"
             onChange={this.QGetTextFromField}
-            rows="3"
+            rows="5" 
             placeholder="Write comment here"
           ></textarea>
         </div>
