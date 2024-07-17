@@ -1,5 +1,5 @@
-import { Component } from "react";
-import { HOME, CATEGORY, BOOKS, COMMENTS, SIGNUP, LOGIN, LOGOUT } from "./Utils/Constants"
+import React, { Component } from "react";
+import { HOME, CATEGORY, BOOKS, COMMENTS, SIGNUP, LOGIN, LOGOUT } from "./Utils/Constants";
 import Home from "./CustomComponents/home";
 import Category from "./CustomComponents/category";
 import Books from "./CustomComponents/books";
@@ -43,10 +43,10 @@ class App extends Component {
       case LOGOUT:
         return <Home />;
     }
-  };
+  }
 
   QSetView = (obj) => {
-    this.setState(this.state.status = { success: null, msg: "" })
+    this.setState(this.state.status = { success: null, msg: "" });
 
     console.log("QSetView");
     this.setState({
@@ -57,7 +57,7 @@ class App extends Component {
 
   render() {
     return (
-      <div id="APP" className="container">
+      <div id="APP" className="container" style={{ backgroundImage: `url(${process.env.PUBLIC_URL}/libraryBooks2.jpg)`, backgroundSize: 'cover', minHeight: '100vh' }}>
         <div id="menu" className="row">
           <nav className="navbar navbar-expand-lg navbar-dark" style={{ backgroundColor: '#003f5c' }}>
             <div className="container-fluid">
@@ -88,7 +88,7 @@ class App extends Component {
                   <li className="nav-item">
                     <a
                       onClick={this.QSetView.bind(this, { page: CATEGORY })}
-                      className="nav-link "
+                      className="nav-link"
                       href="#"
                     >
                       Category
@@ -118,17 +118,22 @@ class App extends Component {
                   <li className="nav-item">
                     <a
                       onClick={this.QSetView.bind(this, { page: SIGNUP })}
-                      className="nav-link "
+                      className="nav-link"
                       href="#"
                     >
                       Sign up
                     </a>
                   </li>
 
-                 <li className="nav-item" ><a onClick={this.QSetView.bind(this, { page: LOGIN })}
-                      className="nav-link " href="#"> Log in </a>
-                 </li>
-                
+                  <li className="nav-item">
+                    <a
+                      onClick={this.QSetView.bind(this, { page: LOGIN })}
+                      className="nav-link"
+                      href="#"
+                    >
+                      Log in
+                    </a>
+                  </li>
                 </ul>
               </div>
             </div>
