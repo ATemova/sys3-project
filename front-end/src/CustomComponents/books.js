@@ -10,7 +10,13 @@ class Books extends Component {
       comment: "",
       title: "",
       rating: 0,
-      starColors: ["#ff4545", "#ffa534", "#ffe234", "#b7dd29", "#57e32c"]
+      starColors: ["#ff4545", "#ffa534", "#ffe234", "#b7dd29", "#57e32c"],
+      books: ["Mathematics I - Analysis I", "Mathematics II - Algebra I", "Theoretical Computer Science I – Discrete Structures", "Theoretical Computer Science II – Formal Languages and Computability", 
+              "Programming I", "Programming II – Concepts of Programming Languages", "Systems I – Hardware", "Systems II – Operating Systems and Computer Networks", "Computer Practicum I", "Computer Practicum II", 
+              "Mathematics III – Algebra II", "Mathematics IV – Combinatorics with Graph Theory", "Data Structures and Algorithms", "Programming III – Concurrent Programming", "Systems III – Information Systems", 
+              "Introduction to Database Systems", "Computer Networks", "Theoretical Computer Science III – Information Theory", "Software Engineering", "Information Technology Management", "Augmented Reality", 
+              "Language Technologies", "Multimedia Design", "Geographic Information Systems", "Human–Computer Interaction", "Introduction to Machine Learning and Data Mining", 
+              "Decision Support Systems", "Adaptive Interactive Systems"] 
     };
   }
 
@@ -40,7 +46,7 @@ class Books extends Component {
   };
 
   render() {
-    const { rating, starColors } = this.state;
+    const { rating, starColors, books } = this.state;
 
     return (
       <div className="card" style={{ margin: "10px" }}>
@@ -48,13 +54,16 @@ class Books extends Component {
         <div className="mb-3" style={{ margin: "10px" }}>
           <div className="mb-3">
             <label htmlFor="title" className="form-label">Name of the book</label>
-            <input
+            <select
               name="title"
-              type="text"
               onChange={this.handleTitleChange}
               className="form-control"
-              placeholder="Name of the book"
-            />
+              value={this.state.title}
+            >
+              {books.map((book, index) => (
+                <option key={index} value={book}>{book}</option>
+              ))}
+            </select>
           </div>
           <div className="mb-3">
             <label htmlFor="comment" className="form-label">Write a comment</label>
