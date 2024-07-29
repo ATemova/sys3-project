@@ -51,7 +51,7 @@ class Category extends React.Component {
                         "Sustainable Built Environments": {
                             "Page under construction": []
                         },
-                        "Nature Conservation": {
+                        "Nature Conservation":{
                             "Page under construction": []
                         },
                     },
@@ -129,12 +129,6 @@ class Category extends React.Component {
     render() {
         const { selectedCategory, selectedSubcategory, selectedDeeperSubcategory, subcategories } = this.state;
 
-        const pageUnderConstructionStyle = {
-            color: "red",
-            fontWeight: "bold",
-            fontSize: "18px" // Adjust size as needed
-        };
-
         return (
             <div style={{ textAlign: "center" }}>
                 {!selectedCategory ? (
@@ -169,7 +163,7 @@ class Category extends React.Component {
                             {Object.keys(subcategories[selectedCategory]).map((subcategory) => (
                                 <div key={subcategory} style={{ margin: "10px 5px", width: "calc(100% / 3 - 20px)" }}>
                                     {subcategory === "Page under construction" ? (
-                                        <p style={pageUnderConstructionStyle}>Page under construction</p>
+                                        <p style={{ color: "red", fontWeight: "bold" }}>Page under construction</p>
                                     ) : (
                                         <button
                                             className="btn btn-secondary"
@@ -214,7 +208,7 @@ class Category extends React.Component {
                             {Object.keys(subcategories[selectedCategory][selectedSubcategory]).map((deeperSubcategory) => (
                                 <div key={deeperSubcategory} style={{ margin: "10px 5px", width: "calc(100% / 3 - 20px)" }}>
                                     {deeperSubcategory === "Page under construction" ? (
-                                        <p style={pageUnderConstructionStyle}>Page under construction</p>
+                                        <p style={{ color: "red", fontWeight: "bold", fontSize: "24px" }}>Page under construction</p>
                                     ) : (
                                         <button
                                             className="btn btn-secondary"
@@ -277,7 +271,7 @@ class Category extends React.Component {
                                     </div>
                                 ))
                             ) : (
-                                <p style={pageUnderConstructionStyle}>Page under construction</p>
+                                <p style={{ color: "red", fontWeight: "bold" }}>Page under construction</p>
                             )}
                         </div>
                         <div style={{ position: "absolute", bottom: "20px", left: "20px" }}>
