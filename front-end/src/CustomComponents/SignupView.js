@@ -5,19 +5,21 @@ import { API_URL } from "../Utils/Configuration";
 class SignupView extends React.Component {
   constructor(props) {
     super(props);
+    // Initialize component state
     this.state = {
       user_input: {
-        username: "",
-        email: "",
-        password: ""
+        username: "", // Stores the username input
+        email: "",    // Stores the email input
+        password: ""  // Stores the password input
       },
       status: {
-        success: false,
-        msg: ""
+        success: false, // Indicates if the registration was successful
+        msg: ""         // Stores status message
       }
     }
   }
 
+  // Updates state with the value of text input fields
   QGetTextFromField = (e) => {
     this.setState({
       user_input: {
@@ -27,8 +29,11 @@ class SignupView extends React.Component {
     });
   }
 
+  // Handles the user registration logic
   QPostSignup = () => {
     const { username, email, password } = this.state.user_input;
+
+    // Validate that all fields are filled
     if (!username || !email || !password) {
       this.setState({
         status: {
@@ -39,6 +44,7 @@ class SignupView extends React.Component {
       return;
     }
 
+    // Send registration data to the server
     axios.post(`${API_URL}/users/register`, {
       username,
       email,
@@ -46,6 +52,7 @@ class SignupView extends React.Component {
     })
       .then(response => {
         if (response.status === 200) {
+          // Update state with success status and clear input fields
           this.setState({
             status: {
               success: true,
@@ -58,11 +65,12 @@ class SignupView extends React.Component {
             }
           });
 
-          // Store user data in local storage to enable auto-login
+          // Store user data in local storage for auto-login
           localStorage.setItem('username', username);
           localStorage.setItem('password', password);
           localStorage.setItem('remember_me', JSON.stringify(true));
         } else {
+          // Handle failed registration
           this.setState({
             status: {
               success: false,
@@ -73,6 +81,7 @@ class SignupView extends React.Component {
       })
       .catch(err => {
         console.error(err);
+        // Handle errors during registration
         this.setState({
           status: {
             success: false,
@@ -83,55 +92,76 @@ class SignupView extends React.Component {
   }
 
   render() {
-    const { status } = this.state;
+    const { user_input, status } = this.state;
 
     return (
-      <div className="card"
-        style={{ width: "400px", margin: "10px auto" }}>
-        <form style={{ margin: "20px" }} >
+      <div className="card" style={{ width: "400px", margin: "10px auto" }}>
+        <form style={{ margin: "20px" }}>
+          {/* Input for the username */}
           <div className="mb-3">
             <label className="form-label">Username</label>
-            <input name="username" onChange={this.QGetTextFromField}
-              value={this.state.user_input.username}
+            <input
+              name="username"
+              onChange={this.QGetTextFromField}
+              value={user_input.username}
               type="text"
               className="form-control"
-              id="exampleInputEmail1"
-              aria-describedby="emailHelp" />
+              id="exampleInputUsername"
+              aria-describedby="usernameHelp"
+            />
           </div>
+          {/* Input for the email address */}
           <div className="mb-3">
             <label className="form-label">Email address</label>
-            <input name="email" onChange={this.QGetTextFromField}
-              value={this.state.user_input.email}
+            <input
+              name="email"
+              onChange={this.QGetTextFromField}
+              value={user_input.email}
               type="email"
               className="form-control"
-              id="exampleInputEmail1"
-              aria-describedby="emailHelp" />
-            <div id="emailHelp"
-              className="form-text">Your email will never be shared with anyone else.
+              id="exampleInputEmail"
+              aria-describedby="emailHelp"
+            />
+            <div id="emailHelp" className="form-text">
+              Your email will never be shared with anyone else.
             </div>
           </div>
+          {/* Input for the password */}
           <div className="mb-3">
             <label className="form-label">Password</label>
-            <input name="password" onChange={this.QGetTextFromField}
-              value={this.state.user_input.password}
+            <input
+              name="password"
+              onChange={this.QGetTextFromField}
+              value={user_input.password}
               type="password"
               className="form-control"
-              id="exampleInputPassword1" />
+              id="exampleInputPassword"
+            />
           </div>
         </form>
-        <button style={{ margin: "10px", backgroundColor: '#003f5c', borderColor: '#003f5c' }} onClick={this.QPostSignup}
-          className="btn btn-primary bt" >Submit</button>
+        {/* Button to submit the signup form */}
+        <button
+          style={{ margin: "10px", backgroundColor: '#003f5c', borderColor: '#003f5c' }}
+          onClick={this.QPostSignup}
+          className="btn btn-primary"
+        >
+          Submit
+        </button>
 
-        {status.success ?
-          <p className="alert alert-success"
-            role="alert">{status.msg}</p> : null}
+        {/* Display success or error messages */}
+        {status.success &&
+          <p className="alert alert-success" role="alert">
+            {status.msg}
+          </p>
+        }
 
-        {!status.success && status.msg !== "" ?
-          <p className="alert alert-danger"
-            role="alert">{status.msg}</p> : null}
-
+        {!status.success && status.msg !== "" &&
+          <p className="alert alert-danger" role="alert">
+            {status.msg}
+          </p>
+        }
       </div>
-    )
+    );
   }
 }
 
