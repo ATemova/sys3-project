@@ -158,7 +158,7 @@ class LoginView extends React.Component {
           onClick={this.QPostLogin}
           className="btn btn-primary"
         >
-          Sign In
+          Log In
         </button>
 
         {/* Display success or error messages */}
