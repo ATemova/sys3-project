@@ -7,6 +7,7 @@ class Category extends React.Component {
             selectedCategory: null,
             selectedSubcategory: null,
             selectedDeeperSubcategory: null,
+            selectedBook: null,
             subcategories: {
                 "UP FAMNIT": {
                     "Bachelor degree": {
@@ -101,36 +102,70 @@ class Category extends React.Component {
     }
 
     handleClick = (category) => {
-        console.log("Category selected:", category);
-        this.setState({ selectedCategory: category, selectedSubcategory: null, selectedDeeperSubcategory: null });
+        this.setState({ selectedCategory: category, selectedSubcategory: null, selectedDeeperSubcategory: null, selectedBook: null });
     };
 
     handleSubcategoryClick = (subcategory) => {
-        console.log("Subcategory selected:", subcategory);
-        this.setState({ selectedSubcategory: subcategory, selectedDeeperSubcategory: null });
+        this.setState({ selectedSubcategory: subcategory, selectedDeeperSubcategory: null, selectedBook: null });
     };
 
     handleDeeperSubcategoryClick = (deeperSubcategory) => {
-        console.log("Deeper subcategory selected:", deeperSubcategory);
-        this.setState({ selectedDeeperSubcategory: deeperSubcategory });
+        if (Array.isArray(this.state.subcategories[this.state.selectedCategory][this.state.selectedSubcategory])) {
+            this.setState({ selectedBook: deeperSubcategory });
+        } else {
+            this.setState({ selectedDeeperSubcategory: deeperSubcategory, selectedBook: null });
+        }
+    };
+
+    handleBookClick = (bookName) => {
+        this.setState({ selectedBook: bookName });
     };
 
     handleBack = () => {
-        const { selectedDeeperSubcategory, selectedSubcategory } = this.state;
-        if (selectedDeeperSubcategory) {
+        const { selectedBook, selectedDeeperSubcategory, selectedSubcategory, selectedCategory } = this.state;
+        if (selectedBook) {
+            this.setState({ selectedBook: null });
+        } else if (selectedDeeperSubcategory) {
             this.setState({ selectedDeeperSubcategory: null });
         } else if (selectedSubcategory) {
             this.setState({ selectedSubcategory: null });
-        } else {
+        } else if (selectedCategory) {
             this.setState({ selectedCategory: null });
         }
     };
 
+    getBookColor = (bookName) => {
+        if (bookName.toLowerCase().includes("math")) return "green";
+        if (bookName.toLowerCase().includes("programming") || bookName.toLowerCase().includes("computer")) return "#003f5c";
+        if (bookName.toLowerCase().includes("theoretical") || bookName.toLowerCase().includes("systems")) return "red";
+        return "orange";
+    };
+
+    renderBook = (bookName) => (
+        <div style={{ textAlign: "center", marginTop: "20px" }}>
+            <div style={{ 
+                width: "300px", 
+                height: "300px", 
+                backgroundColor: this.getBookColor(bookName), 
+                color: "white", 
+                borderRadius: "10px", 
+                display: "flex", 
+                alignItems: "center", 
+                justifyContent: "center", 
+                fontSize: "18px", 
+                fontWeight: "bold", 
+                margin: "0 auto"
+            }}>
+                {bookName}
+            </div>
+        </div>
+    );
+
     render() {
-        const { selectedCategory, selectedSubcategory, selectedDeeperSubcategory, subcategories } = this.state;
+        const { selectedCategory, selectedSubcategory, selectedDeeperSubcategory, selectedBook, subcategories } = this.state;
 
         return (
-            <div style={{ textAlign: "center" }}>
+            <div style={{ textAlign: "center", position: "relative", minHeight: "100vh" }}>
                 {!selectedCategory ? (
                     <>
                         <h1>Choose one of the libraries below</h1>
@@ -184,31 +219,15 @@ class Category extends React.Component {
                                 </div>
                             ))}
                         </div>
-                        <div style={{ position: "absolute", bottom: "20px", left: "20px" }}>
-                            <button
-                                className="btn btn-secondary"
-                                style={{
-                                    padding: "10px",
-                                    fontSize: "16px",
-                                    backgroundColor: "#003f5c",
-                                    border: "2px solid #003f5c",
-                                    color: "#ffffff",
-                                    borderRadius: "5px"
-                                }}
-                                onClick={this.handleBack}
-                            >
-                                ← Back
-                            </button>
-                        </div>
                     </>
                 ) : !selectedDeeperSubcategory ? (
                     <>
-                        <h3>Subcategories of {selectedSubcategory} in {selectedCategory}:</h3>
+                        <h3>{selectedSubcategory} Subcategories in {selectedCategory}:</h3>
                         <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center" }}>
                             {Object.keys(subcategories[selectedCategory][selectedSubcategory]).map((deeperSubcategory) => (
                                 <div key={deeperSubcategory} style={{ margin: "10px 5px", width: "calc(100% / 3 - 20px)" }}>
                                     {deeperSubcategory === "Page under construction" ? (
-                                        <p style={{ color: "red", fontWeight: "bold", fontSize: "24px" }}>Page under construction</p>
+                                        <p style={{ color: "red", fontWeight: "bold" }}>Page under construction</p>
                                     ) : (
                                         <button
                                             className="btn btn-secondary"
@@ -229,23 +248,9 @@ class Category extends React.Component {
                                 </div>
                             ))}
                         </div>
-                        <div style={{ position: "absolute", bottom: "20px", left: "20px" }}>
-                            <button
-                                className="btn btn-secondary"
-                                style={{
-                                    padding: "10px",
-                                    fontSize: "16px",
-                                    backgroundColor: "#003f5c",
-                                    border: "2px solid #003f5c",
-                                    color: "#ffffff",
-                                    borderRadius: "5px"
-                                }}
-                                onClick={this.handleBack}
-                            >
-                                ← Back
-                            </button>
-                        </div>
                     </>
+                ) : selectedBook ? (
+                    this.renderBook(selectedBook)
                 ) : (
                     <>
                         <h3>Books for {selectedDeeperSubcategory} in {selectedSubcategory} of {selectedCategory}:</h3>
@@ -259,12 +264,12 @@ class Category extends React.Component {
                                                 width: "100%",
                                                 padding: "10px",
                                                 fontSize: "16px",
-                                                backgroundColor: "#003f5c",
+                                                backgroundColor: this.getBookColor(book),
                                                 border: "2px solid #003f5c",
                                                 color: "#ffffff",
                                                 borderRadius: "5px"
                                             }}
-                                            onClick={() => console.log(`Selected: ${book}`)}
+                                            onClick={() => this.handleBookClick(book)}
                                         >
                                             {book}
                                         </button>
@@ -274,24 +279,31 @@ class Category extends React.Component {
                                 <p style={{ color: "red", fontWeight: "bold" }}>Page under construction</p>
                             )}
                         </div>
-                        <div style={{ position: "absolute", bottom: "20px", left: "20px" }}>
-                            <button
-                                className="btn btn-secondary"
-                                style={{
-                                    padding: "10px",
-                                    fontSize: "16px",
-                                    backgroundColor: "#003f5c",
-                                    border: "2px solid #003f5c",
-                                    color: "#ffffff",
-                                    borderRadius: "5px"
-                                }}
-                                onClick={this.handleBack}
-                            >
-                                ← Back
-                            </button>
-                        </div>
                     </>
                 )}
+                <div style={{
+                    position: "fixed",
+                    bottom: "20px",
+                    left: "20px",
+                    width: "auto",
+                    display: "flex",
+                    justifyContent: "center"
+                }}>
+                    <button
+                        className="btn btn-secondary"
+                        style={{
+                            padding: "10px",
+                            fontSize: "16px",
+                            backgroundColor: "#003f5c",
+                            border: "2px solid #003f5c",
+                            color: "#ffffff",
+                            borderRadius: "5px"
+                        }}
+                        onClick={this.handleBack}
+                    >
+                        ← Back
+                    </button>
+                </div>
             </div>
         );
     }
