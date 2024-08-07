@@ -5,19 +5,21 @@ import { API_URL } from "../Utils/Configuration";
 class Comments extends React.Component {
   constructor(props) {
     super(props);
+    // Initialize component state
     this.state = {
       novica: {
-        title: "",
-        text: "",
-        file: null,
+        title: "", // Stores the title of the comment
+        text: "", // Stores the text of the comment
+        file: null, // Stores the uploaded file
       },
       status: {
-        success: null,
-        msg: "",
+        success: null, // Indicates if the operation was successful
+        msg: "", // Stores the status message
       },
     };
   }
 
+  // Updates state with the value of text input fields
   QGetTextFromField = (e) => {
     this.setState({
       novica: {
@@ -28,6 +30,7 @@ class Comments extends React.Component {
     console.log(this.state);
   };
 
+  // Handles file upload and updates state with the selected file
   QFileUpload = (e) => {
     this.setState({
       novica: {
@@ -38,7 +41,9 @@ class Comments extends React.Component {
     console.log(this.state);
   };
 
+  // Sends comment data to the server
   QPostNovica = () => {
+    // Validate that title and text fields are not empty
     if (this.state.novica.title === "" || this.state.novica.text === "") {
       this.setState({
         status: { success: false, msg: "Missing input field" },
@@ -47,16 +52,19 @@ class Comments extends React.Component {
     }
     console.log("QPostNovica");
 
+    // Create FormData object to send file and text data
     const data = new FormData();
     data.append("file", this.state.novica.file);
     data.append("title", this.state.novica.title);
     data.append("text", this.state.novica.text);
 
+    // Create an axios instance with a timeout and credentials
     let req = axios.create({
-      timeout: 20000,
-      withCredentials: true,
+      timeout: 20000, // 20 seconds timeout
+      withCredentials: true, // Send cookies with the request
     });
 
+    // Send POST request to the server
     req
       .post(API_URL + "/novice", data)
       .then((response) => {
@@ -73,6 +81,8 @@ class Comments extends React.Component {
     return (
       <div className="card" style={{ margin: "10px", minHeight: "50vh", padding: "20px" }}>
         <h3 style={{ margin: "10px" }}>Welcome user</h3>
+        
+        {/* Input for the title of the comment */}
         <div className="mb-3" style={{ margin: "10px" }}>
           <label className="form-label">Title of the comment</label>
           <input
@@ -83,6 +93,8 @@ class Comments extends React.Component {
             placeholder="Title of the comment"
           />
         </div>
+
+        {/* Textarea for the comment text */}
         <div className="mb-3" style={{ margin: "10px" }}>
           <label className="form-label">Write comment here</label>
           <textarea
@@ -94,6 +106,7 @@ class Comments extends React.Component {
           ></textarea>
         </div>
 
+        {/* Button to send the comment */}
         <button
           className="btn btn-primary"
           onClick={this.QPostNovica}
@@ -106,28 +119,12 @@ class Comments extends React.Component {
           Send
         </button>
 
-        {success && (
-          <p className="alert alert-success" role="alert">
+        {/* Display success or error messages */}
+        {success !== null && (
+          <p className={`alert ${success ? 'alert-success' : 'alert-danger'}`} role="alert">
             {msg}
           </p>
         )}
-        {success === false && msg !== "" && (
-          <p className="alert alert-danger" role="alert">
-            {msg}
-          </p>
-        )}
-
-        {this.state.status.success ? (
-          <p className="alert alert-success" role="alert">
-            {this.state.status.msg}
-          </p>
-        ) : null}
-
-        {!this.state.status.success && this.state.status.msg !== "" ? (
-          <p className="alert alert-danger" role="alert">
-            {this.state.status.msg}
-          </p>
-        ) : null}
       </div>
     );
   }
