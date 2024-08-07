@@ -9,14 +9,15 @@ import LoginView from "./CustomComponents/LoginView";
 import axios from "axios";
 import { API_URL } from "./Utils/Configuration";
 import Cookies from 'universal-cookie';
+
 const cookies = new Cookies();
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      CurrentPage: LOGIN,
-      Novica: 1,
+      CurrentPage: LOGIN, // Default page
+      Novica: 1, // Example state, usage depends on your implementation
       status: {
         success: null,
         msg: ""
@@ -25,11 +26,10 @@ class App extends Component {
     };
   }
 
+  // Determines which component to render based on the current page state
   QGetView(state) {
     const page = state.CurrentPage;
     switch (page) {
-      default:
-        return <Home />;
       case CATEGORY:
         return <Category />;
       case COMMENTS:
@@ -42,27 +42,29 @@ class App extends Component {
         return <LoginView QUserFromChild={this.QSetLoggedIn} />;
       case LOGOUT:
         return <Home />;
+      default:
+        return <Home />;
     }
   }
 
+  // Updates the current page and optionally other states
   QSetView = (obj) => {
-    this.setState(this.state.status = { success: null, msg: "" });
-
-    console.log("QSetView");
     this.setState({
+      status: { success: null, msg: "" }, // Reset status
       CurrentPage: obj.page,
-      Rating: obj.id || 0
+      Rating: obj.id || 0 // Set Rating if provided
     });
   };
 
   render() {
     return (
-      <div id="APP" className="container" style={{ backgroundImage: `url(${process.env.PUBLIC_URL}/libraryBooks2.jpg)`, backgroundSize: 'cover', minHeight: '100vh' }}>
+      <div id="APP" className="container"
+        style={{ backgroundImage: `url(${process.env.PUBLIC_URL}/libraryBooks2.jpg)`, backgroundSize: 'cover', minHeight: '100vh' }}>
         <div id="menu" className="row">
           <nav className="navbar navbar-expand-lg navbar-dark" style={{ backgroundColor: '#003f5c' }}>
             <div className="container-fluid">
               <a
-                onClick={this.QSetView.bind(this, { page: "home" })}
+                onClick={() => this.QSetView({ page: HOME })}
                 className="navbar-brand"
                 href="#"
               >
@@ -87,7 +89,7 @@ class App extends Component {
                 <ul className="navbar-nav me-auto mb-2 mb-lg-0">
                   <li className="nav-item">
                     <a
-                      onClick={this.QSetView.bind(this, { page: CATEGORY })}
+                      onClick={() => this.QSetView({ page: CATEGORY })}
                       className="nav-link"
                       href="#"
                     >
@@ -97,7 +99,7 @@ class App extends Component {
 
                   <li className="nav-item">
                     <a
-                      onClick={this.QSetView.bind(this, { page: BOOKS })}
+                      onClick={() => this.QSetView({ page: BOOKS })}
                       className="nav-link"
                       href="#"
                     >
@@ -107,7 +109,7 @@ class App extends Component {
 
                   <li className="nav-item">
                     <a
-                      onClick={this.QSetView.bind(this, { page: COMMENTS })}
+                      onClick={() => this.QSetView({ page: COMMENTS })}
                       className="nav-link"
                       href="#"
                     >
@@ -117,7 +119,7 @@ class App extends Component {
 
                   <li className="nav-item">
                     <a
-                      onClick={this.QSetView.bind(this, { page: SIGNUP })}
+                      onClick={() => this.QSetView({ page: SIGNUP })}
                       className="nav-link"
                       href="#"
                     >
@@ -127,7 +129,7 @@ class App extends Component {
 
                   <li className="nav-item">
                     <a
-                      onClick={this.QSetView.bind(this, { page: LOGIN })}
+                      onClick={() => this.QSetView({ page: LOGIN })}
                       className="nav-link"
                       href="#"
                     >
@@ -141,7 +143,7 @@ class App extends Component {
         </div>
 
         <div id="viewer" className="row container">
-          {this.QGetView(this.state)}
+          {this.QGetView(this.state)} {/* Render the appropriate component based on current page */}
         </div>
       </div>
     );
