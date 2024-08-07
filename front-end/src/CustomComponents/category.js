@@ -3,11 +3,13 @@ import React from "react";
 class Category extends React.Component {
     constructor(props) {
         super(props);
+        // Initialize component state
         this.state = {
             selectedCategory: null,
             selectedSubcategory: null,
             selectedDeeperSubcategory: null,
             selectedBook: null,
+            // Hierarchical structure for categories and subcategories
             subcategories: {
                 "UP FAMNIT": {
                     "Bachelor degree": {
@@ -57,6 +59,7 @@ class Category extends React.Component {
                         },
                     },
                 },
+                // Other categories follow a similar structure
                 "UP FHŠ": {
                     "Bachelor degree": {
                         "Page under construction": []
@@ -101,26 +104,43 @@ class Category extends React.Component {
         };
     }
 
+    // Handler for category selection
     handleClick = (category) => {
-        this.setState({ selectedCategory: category, selectedSubcategory: null, selectedDeeperSubcategory: null, selectedBook: null });
+        this.setState({ 
+            selectedCategory: category, 
+            selectedSubcategory: null, 
+            selectedDeeperSubcategory: null, 
+            selectedBook: null 
+        });
     };
 
+    // Handler for subcategory selection
     handleSubcategoryClick = (subcategory) => {
-        this.setState({ selectedSubcategory: subcategory, selectedDeeperSubcategory: null, selectedBook: null });
+        this.setState({ 
+            selectedSubcategory: subcategory, 
+            selectedDeeperSubcategory: null, 
+            selectedBook: null 
+        });
     };
 
+    // Handler for deeper subcategory or book selection
     handleDeeperSubcategoryClick = (deeperSubcategory) => {
         if (Array.isArray(this.state.subcategories[this.state.selectedCategory][this.state.selectedSubcategory])) {
             this.setState({ selectedBook: deeperSubcategory });
         } else {
-            this.setState({ selectedDeeperSubcategory: deeperSubcategory, selectedBook: null });
+            this.setState({ 
+                selectedDeeperSubcategory: deeperSubcategory, 
+                selectedBook: null 
+            });
         }
     };
 
+    // Handler for book selection
     handleBookClick = (bookName) => {
         this.setState({ selectedBook: bookName });
     };
 
+    // Handler to navigate back to previous state
     handleBack = () => {
         const { selectedBook, selectedDeeperSubcategory, selectedSubcategory, selectedCategory } = this.state;
         if (selectedBook) {
@@ -134,6 +154,7 @@ class Category extends React.Component {
         }
     };
 
+    // Determines the color of a book based on its name
     getBookColor = (bookName) => {
         if (bookName.toLowerCase().includes("math")) return "green";
         if (bookName.toLowerCase().includes("programming") || bookName.toLowerCase().includes("computer")) return "#003f5c";
@@ -141,6 +162,7 @@ class Category extends React.Component {
         return "orange";
     };
 
+    // Renders a book with appropriate styling
     renderBook = (bookName) => (
         <div style={{ textAlign: "center", marginTop: "20px" }}>
             <div style={{ 
@@ -166,6 +188,7 @@ class Category extends React.Component {
 
         return (
             <div style={{ textAlign: "center", position: "relative", minHeight: "100vh" }}>
+                {/* Display category selection if no category is selected */}
                 {!selectedCategory ? (
                     <>
                         <h1>Choose one of the libraries below</h1>
@@ -250,6 +273,7 @@ class Category extends React.Component {
                         </div>
                     </>
                 ) : selectedBook ? (
+                    // Render the selected book
                     this.renderBook(selectedBook)
                 ) : (
                     <>
@@ -281,6 +305,7 @@ class Category extends React.Component {
                         </div>
                     </>
                 )}
+                {/* Back button for navigation */}
                 <div style={{
                     position: "fixed",
                     bottom: "20px",
