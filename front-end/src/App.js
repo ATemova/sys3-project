@@ -22,9 +22,43 @@ class App extends Component {
         success: null,
         msg: ""
       },
-      user: null
+      user: null // Track user login state
     };
   }
+
+  componentDidMount() {
+    this.checkSession();
+  }
+
+  checkSession = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/session`, { withCredentials: true });
+      if (response.data.logged_in) {
+        this.setState({ user: response.data.user });
+      }
+    } catch (error) {
+      console.error("Error checking session:", error);
+    }
+  };
+
+  // Handle user logout
+  handleLogout = async () => {
+    try {
+      const response = await axios.post(`${API_URL}/logout`, {}, { withCredentials: true });
+      if (response.data.status.success) {
+        this.setState({ user: null });
+        this.QSetView({ page: HOME });
+      }
+    } catch (error) {
+      console.error("Error logging out:", error);
+    }
+  };
+
+  // Update user login status from child component
+  QSetLoggedIn = (user) => {
+    this.setState({ user });
+    this.QSetView({ page: HOME });
+  };
 
   // Determines which component to render based on the current page state
   QGetView(state) {
@@ -37,7 +71,7 @@ class App extends Component {
       case BOOKS:
         return <Books />;
       case SIGNUP:
-        return <SignupView />;
+        return <SignupView QUserFromChild={this.QSetLoggedIn} />;
       case LOGIN:
         return <LoginView QUserFromChild={this.QSetLoggedIn} />;
       case LOGOUT:
@@ -57,6 +91,7 @@ class App extends Component {
   };
 
   render() {
+    const { user } = this.state;
     return (
       <div id="APP" className="container"
         style={{ backgroundImage: `url(${process.env.PUBLIC_URL}/libraryBooks2.jpg)`, backgroundSize: 'cover', minHeight: '100vh' }}>
@@ -117,25 +152,41 @@ class App extends Component {
                     </a>
                   </li>
 
-                  <li className="nav-item">
-                    <a
-                      onClick={() => this.QSetView({ page: SIGNUP })}
-                      className="nav-link"
-                      href="#"
-                    >
-                      Sign up
-                    </a>
-                  </li>
+                  {!user && (
+                    <>
+                      <li className="nav-item">
+                        <a
+                          onClick={() => this.QSetView({ page: SIGNUP })}
+                          className="nav-link"
+                          href="#"
+                        >
+                          Sign up
+                        </a>
+                      </li>
 
-                  <li className="nav-item">
-                    <a
-                      onClick={() => this.QSetView({ page: LOGIN })}
-                      className="nav-link"
-                      href="#"
-                    >
-                      Log in
-                    </a>
-                  </li>
+                      <li className="nav-item">
+                        <a
+                          onClick={() => this.QSetView({ page: LOGIN })}
+                          className="nav-link"
+                          href="#"
+                        >
+                          Log in
+                        </a>
+                      </li>
+                    </>
+                  )}
+
+                  {user && (
+                    <li className="nav-item">
+                      <a
+                        onClick={this.handleLogout}
+                        className="nav-link"
+                        href="#"
+                      >
+                        Log out
+                      </a>
+                    </li>
+                  )}
                 </ul>
               </div>
             </div>
