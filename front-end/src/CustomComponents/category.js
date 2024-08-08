@@ -171,9 +171,9 @@ class Category extends React.Component {
 
     // Determines the color of a book based on its name
     getBookColor = (bookName) => {
-        if (bookName.toLowerCase().includes("math") || bookName.toLowerCase().includes("algebra") || bookName.toLowerCase().includes("analysis")) return "#7FFFD4";
-        if (bookName.toLowerCase().includes("programming") || bookName.toLowerCase().includes("computer") || bookName.toLowerCase().includes("coding")) return "#003F5C";
-        if (bookName.toLowerCase().includes("theoretical") || bookName.toLowerCase().includes("systems") || bookName.toLowerCase().includes("theory")) return "#FF0000";
+        if (bookName.toLowerCase().includes("math") || bookName.toLowerCase().includes("algebra") || bookName.toLowerCase().includes("analysis") || bookName.toLowerCase().includes("physiology")) return "#7FFFD4";
+        if (bookName.toLowerCase().includes("programming") || bookName.toLowerCase().includes("computer") || bookName.toLowerCase().includes("coding") || bookName.toLowerCase().includes("biology")) return "#003F5C";
+        if (bookName.toLowerCase().includes("theoretical") || bookName.toLowerCase().includes("systems") || bookName.toLowerCase().includes("theory") || bookName.toLowerCase().includes("general")) return "#FF0000";
         if (bookName.toLowerCase().includes("psychology") || bookName.toLowerCase().includes("english") || bookName.toLowerCase().includes("algorithms")) return "#4D0099";
         return "#FFA500";
     };
