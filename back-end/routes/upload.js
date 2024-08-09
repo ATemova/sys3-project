@@ -1,32 +1,40 @@
 const multer = require('multer');
-const express = require("express")
+const express = require("express");
 const upload = express.Router();
-const DB = require('../db/dbConn.js')
+const DB = require('../db/dbConn.js');
 
-
+// Configure Multer's storage settings
 const storage = multer.diskStorage({
     destination: (req, file, callBack) => {
-        callBack(null, 'uploads')
+        // Set the destination folder for uploaded files
+        callBack(null, 'uploads');
     },
     filename: (req, file, callBack) => {
-        callBack(null, `${file.originalname}`)
+        // Set the filename for uploaded files to their original name
+        // You might want to consider adding a unique identifier (like a timestamp) to prevent filename collisions
+        callBack(null, `${file.originalname}`);
     }
-  })
-  
-// Configure Multer,
-let upload_dest = multer({ dest: 'uploads/' })
+});
 
-//upload_dest.single('file') => callback that should be called once this happens.
-//upload_dest.array('files') => callback that should be called once this happens.
+// Initialize Multer with the configured storage
+let upload_dest = multer({ storage: storage });
+
+// Handle file upload via POST request
 upload.post('/', upload_dest.single('file'), async (req, res, next) => {
-    const file = req.file;
+    // 'single' means it expects a single file upload under the form field named 'file'
+    const file = req.file; // Get the uploaded file information
+
+    // Log the filename to the console (for debugging)
     console.log(file.filename);
+
+    // Check if the file was uploaded successfully
     if (!file) {
-      res.send({ status: { success: false, msg: "Could not uplpad" }});
-    }else{
-      res.send({ status: { success: true, msg: "File upladed" }});
-    }   
-})
+        // Respond with an error message if no file was uploaded
+        res.send({ status: { success: false, msg: "Could not upload" } });
+    } else {
+        // Respond with a success message if the file was uploaded
+        res.send({ status: { success: true, msg: "File uploaded" } });
+    }
+});
 
-module.exports = upload
-
+module.exports = upload;

@@ -1,71 +1,59 @@
-const express = require('express')
-const session = require('express-session')
-const cors=require("cors")
+const express = require('express');
+const session = require('express-session');
+const cors = require("cors");
 const cookieParser = require("cookie-parser");
+const path = require('path');
+require('dotenv').config();
 
-
-require('dotenv').config()
-const app = express()
-const port = process.env.PORT || 5000
+const app = express();
+const port = process.env.PORT || 8229;
 
 app.use(cookieParser());
 
-// Configuration if we had cross origin enabled.
-// let sess = {
-//     secret: 'our litle secret',
-//     resave: false,
-//     proxy: true,
-//     saveUninitialized: true,
-//     cookie: {
-//         secure: true,
-//         sameSite: 'none'
-//     }
-// }
-
+// Session configuration
 let sess = {
-    secret: 'our litle secrett',
+    secret: process.env.SESSION_SECRET || 'our little secret',
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: false }
+    cookie: { 
+        secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        httpOnly: true,
+        proxy: process.env.NODE_ENV === 'production', // Required for secure cookies over HTTPS behind proxy
+    }
+};
+
+if (process.env.NODE_ENV === 'production') {
+    app.set('trust proxy', 1); // Trust the first proxy when behind a reverse proxy like Nginx or Heroku
 }
-// let sess = {
-//     secret: 'our litle secret',
-//     saveUninitialized: true,
-//     resave: false,
-//     proxy: true,
-//     name:"app",
-//     cookie: {
-//         httpOnly: true,
-//     }
-// }
 
-app.use(session(sess))
+app.use(session(sess));
 
-//Some configurations
-app.use(express.urlencoded({extended : true}));
+// CORS configuration
 app.use(cors({
  methods:["GET", "POST"],
   credentials: true, 
-  origin: ['http://localhost:3000','http://localhost:3001']
-}))
+  origin: ['http://localhost:3000', 'http://localhost:3001']
+}));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-const novice = require('./routes/novice')
-const users = require('./routes/users')
-const upload = require('./routes/upload')
 
-app.use('/novice', novice)
-app.use('/users', users)
-app.use('/uploadFile', upload)
+// Routes
+const novice = require('./routes/novice');
+const users = require('./routes/users');
+const upload = require('./routes/upload');
 
-const path = require('path')
-console.log(__dirname)
-app.use(express.static(path.join(__dirname, "build")))
-app.use(express.static(path.join(__dirname, "uploads")))
+app.use('/novice', novice);
+app.use('/users', users);
+app.use('/uploadFile', upload);
+
+// Static files configuration
+app.use(express.static(path.join(__dirname, "build")));
+app.use(express.static(path.join(__dirname, "uploads")));
 
 app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "build", "index.html")) 
-})
+    res.sendFile(path.join(__dirname, "build", "index.html")); 
+});
 
-app.listen(port, () => console.log(`Example app listening on port ${port}!`))
+app.listen(port, () => console.log(`App listening on port ${port}!`));
