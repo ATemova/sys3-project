@@ -10,7 +10,9 @@ class SignupView extends React.Component {
       user_input: {
         username: "", // Stores the username input
         email: "",    // Stores the email input
-        password: ""  // Stores the password input
+        password: "", // Stores the password input
+        name: "",     // Stores the first name input
+        surname: ""   // Stores the surname input
       },
       status: {
         success: false, // Indicates if the registration was successful
@@ -31,10 +33,10 @@ class SignupView extends React.Component {
 
   // Handles the user registration logic
   QPostSignup = () => {
-    const { username, email, password } = this.state.user_input;
+    const { username, email, password, name, surname } = this.state.user_input;
 
     // Validate that all fields are filled
-    if (!username || !email || !password) {
+    if (!username || !email || !password || !name || !surname) {
       this.setState({
         status: {
           success: false,
@@ -48,7 +50,9 @@ class SignupView extends React.Component {
     axios.post(`${API_URL}/users/register`, {
       username,
       email,
-      password
+      password,
+      name,
+      surname
     })
       .then(response => {
         if (response.status === 200) {
@@ -61,7 +65,9 @@ class SignupView extends React.Component {
             user_input: {
               username: "",
               email: "",
-              password: ""
+              password: "",
+              name: "",
+              surname: ""
             }
           });
 
@@ -97,6 +103,30 @@ class SignupView extends React.Component {
     return (
       <div className="card" style={{ width: "400px", margin: "10px auto" }}>
         <form style={{ margin: "20px" }}>
+          {/* Input for the name */}
+          <div className="mb-3">
+            <label className="form-label">Name</label>
+            <input
+              name="name"
+              onChange={this.QGetTextFromField}
+              value={user_input.name}
+              type="text"
+              className="form-control"
+              id="exampleInputName"
+            />
+          </div>
+          {/* Input for the surname */}
+          <div className="mb-3">
+            <label className="form-label">Surname</label>
+            <input
+              name="surname"
+              onChange={this.QGetTextFromField}
+              value={user_input.surname}
+              type="text"
+              className="form-control"
+              id="exampleInputSurname"
+            />
+          </div>
           {/* Input for the username */}
           <div className="mb-3">
             <label className="form-label">Username</label>
