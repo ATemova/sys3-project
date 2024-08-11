@@ -1,9 +1,9 @@
 import React, { Component } from "react";
 import { HOME, CATEGORY, BOOKS, COMMENTS, SIGNUP, LOGIN, LOGOUT } from "./Utils/Constants";
 import Home from "./CustomComponents/home";
-import Category from "./CustomComponents/category";
-import Books from "./CustomComponents/books";
-import Comments from "./CustomComponents/comments";
+import Category from "./CustomComponents/Category";
+import Books from "./CustomComponents/Books";
+import Comments from "./CustomComponents/Comments";
 import SignupView from "./CustomComponents/SignupView";
 import LoginView from "./CustomComponents/LoginView";
 import axios from "axios";
@@ -99,7 +99,7 @@ class App extends Component {
           <nav className="navbar navbar-expand-lg navbar-dark" style={{ backgroundColor: '#003f5c' }}>
             <div className="container-fluid">
               <a
-                onClick={() => this.QSetView({ page: HOME })}
+                onClick={(e) => { e.preventDefault(); this.QSetView({ page: HOME }); }}
                 className="navbar-brand"
                 href="#"
               >
@@ -124,7 +124,7 @@ class App extends Component {
                 <ul className="navbar-nav me-auto mb-2 mb-lg-0">
                   <li className="nav-item">
                     <a
-                      onClick={() => this.QSetView({ page: CATEGORY })}
+                      onClick={(e) => { e.preventDefault(); this.QSetView({ page: CATEGORY }); }}
                       className="nav-link"
                       href="#"
                     >
@@ -134,7 +134,7 @@ class App extends Component {
 
                   <li className="nav-item">
                     <a
-                      onClick={() => this.QSetView({ page: BOOKS })}
+                      onClick={(e) => { e.preventDefault(); this.QSetView({ page: BOOKS }); }}
                       className="nav-link"
                       href="#"
                     >
@@ -144,7 +144,7 @@ class App extends Component {
 
                   <li className="nav-item">
                     <a
-                      onClick={() => this.QSetView({ page: COMMENTS })}
+                      onClick={(e) => { e.preventDefault(); this.QSetView({ page: COMMENTS }); }}
                       className="nav-link"
                       href="#"
                     >
@@ -156,7 +156,7 @@ class App extends Component {
                     <>
                       <li className="nav-item">
                         <a
-                          onClick={() => this.QSetView({ page: SIGNUP })}
+                          onClick={(e) => { e.preventDefault(); this.QSetView({ page: SIGNUP }); }}
                           className="nav-link"
                           href="#"
                         >
@@ -166,7 +166,7 @@ class App extends Component {
 
                       <li className="nav-item">
                         <a
-                          onClick={() => this.QSetView({ page: LOGIN })}
+                          onClick={(e) => { e.preventDefault(); this.QSetView({ page: LOGIN }); }}
                           className="nav-link"
                           href="#"
                         >
@@ -179,7 +179,7 @@ class App extends Component {
                   {user && (
                     <li className="nav-item">
                       <a
-                        onClick={this.handleLogout}
+                        onClick={(e) => { e.preventDefault(); this.handleLogout(); }}
                         className="nav-link"
                         href="#"
                       >
