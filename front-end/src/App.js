@@ -17,7 +17,6 @@ class App extends Component {
     super(props);
     this.state = {
       CurrentPage: LOGIN, // Default page
-      Novica: 1, // Example state, usage depends on your implementation
       status: {
         success: null,
         msg: ""
@@ -28,7 +27,22 @@ class App extends Component {
 
   componentDidMount() {
     this.checkSession();
+    this.setupAxiosInterceptors();
   }
+
+  setupAxiosInterceptors = () => {
+    // Intercepting responses to handle session expiration or unauthorized access
+    axios.interceptors.response.use(
+      response => response,
+      error => {
+        if (error.response.status === 401) {
+          this.setState({ user: null, CurrentPage: LOGIN });
+          cookies.remove('session');
+        }
+        return Promise.reject(error);
+      }
+    );
+  };
 
   checkSession = async () => {
     try {
@@ -41,7 +55,6 @@ class App extends Component {
     }
   };
 
-  // Handle user logout
   handleLogout = async () => {
     try {
       const response = await axios.post(`${API_URL}/logout`, {}, { withCredentials: true });
@@ -54,14 +67,12 @@ class App extends Component {
     }
   };
 
-  // Update user login status from child component
   QSetLoggedIn = (user) => {
     this.setState({ user });
     this.QSetView({ page: HOME });
   };
 
-  // Determines which component to render based on the current page state
-  QGetView(state) {
+  QGetView = (state) => {
     const page = state.CurrentPage;
     switch (page) {
       case CATEGORY:
@@ -79,9 +90,8 @@ class App extends Component {
       default:
         return <Home />;
     }
-  }
+  };
 
-  // Updates the current page and optionally other states
   QSetView = (obj) => {
     this.setState({
       status: { success: null, msg: "" }, // Reset status
