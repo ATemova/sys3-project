@@ -1,19 +1,19 @@
 const express = require('express');
-const users = express.Router();
+const authRoutes = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const DB = require('../db/dbConn.js');
-const UTILS = require('../utils/functions.js');
+const Database = require('../db/dbConn.js');
+const UtilityFunctions = require('../utils/functions.js');
 
 // Ensure JWT secret key is set
-const JWT_SECRET_KEY = process.env.JWT_TOKEN_SECRET;
-if (!JWT_SECRET_KEY) {
+const JWT_SECRET = process.env.JWT_TOKEN_SECRET;
+if (!JWT_SECRET) {
     console.error('JWT secret key is missing');
     process.exit(1); // Exit the process if the secret key is missing
 }
 
 // User login route
-users.post('/login', async (req, res) => {
+authRoutes.post('/login', async (req, res) => {
     try {
         // Destructure username and password from request body
         const { username, password } = req.body;
@@ -21,202 +21,202 @@ users.post('/login', async (req, res) => {
         // Check if both username and password are provided
         if (!username || !password) {
             console.error('Missing username or password');
-            return res.status(400).json({ success: false, msg: "Please enter both Username & Password!" });
+            return res.status(400).json({ success: false, message: "Please enter both Username & Password!" });
         }
 
         // Validate username format
-        if (!UTILS.verifyUsername(username)) {
+        if (!UtilityFunctions.verifyUsername(username)) {
             console.error('Invalid username');
-            return res.status(400).json({ success: false, msg: "Wrong username, contains disallowed characters!" });
+            return res.status(400).json({ success: false, message: "Wrong username, contains disallowed characters!" });
         }
 
-        let user;
+        let userRecord;
         try {
             // Check if the username exists in the database
-            const queryResult = await DB.authUsername(username);
-            if (queryResult.length === 0) {
+            const userQueryResult = await Database.authUsername(username);
+            if (userQueryResult.length === 0) {
                 console.error('Username not found');
-                return res.status(404).json({ success: false, msg: "Username does not exist. Please create a new account!" });
+                return res.status(404).json({ success: false, message: "Username does not exist. Please create a new account!" });
             }
-            user = queryResult[0]; // Get user details
+            userRecord = userQueryResult[0]; // Get user details
         } catch (error) {
             console.error('Error querying username:', error);
-            return res.status(503).json({ success: false, msg: "Error while processing username. Please try again later." });
+            return res.status(503).json({ success: false, message: "Error while processing username. Please try again later." });
         }
 
         // Compare provided password with hashed password from database
-        const passwordMatch = await bcrypt.compare(password, user.password);
-        if (!passwordMatch) {
+        const isPasswordCorrect = await bcrypt.compare(password, userRecord.password);
+        if (!isPasswordCorrect) {
             console.error('Incorrect password');
-            return res.status(401).json({ success: false, msg: "Incorrect password!" });
+            return res.status(401).json({ success: false, message: "Incorrect password!" });
         }
 
         // Create a JWT token for the user
-        const token = jwt.sign({ user: username }, JWT_SECRET_KEY, { expiresIn: '1h' });
+        const authToken = jwt.sign({ user: username }, JWT_SECRET, { expiresIn: '1h' });
 
         console.log("User successfully logged in!");
-        return res.status(200).json({ success: true, token: token, user: user.username, msg: "User is logged in!" });
+        return res.status(200).json({ success: true, token: authToken, user: userRecord.username, message: "User is logged in!" });
     } catch (err) {
         console.error('Internal server error:', err);
-        return res.status(500).json({ success: false, msg: "Internal server error! Try again later." });
+        return res.status(500).json({ success: false, message: "Internal server error! Try again later." });
     }
 });
 
 // User registration route
-users.post('/register', async (req, res) => {
+authRoutes.post('/register', async (req, res) => {
     try {
         // Destructure registration details from request body
-        const { name, surname, username, email, password, password2, role } = req.body;
+        const { firstName, lastName, username, email, password, confirmPassword, userRole } = req.body;
 
         // Check if all required fields are provided
-        if (!name || !surname || !username || !email || !password || !password2 || !role) {
+        if (!firstName || !lastName || !username || !email || !password || !confirmPassword || !userRole) {
             console.error('Missing input fields');
-            return res.status(400).json({ success: false, msg: "Input field missing! Please fill in all the fields." });
+            return res.status(400).json({ success: false, message: "Input field missing! Please fill in all the fields." });
         }
 
         // Validate email format
-        if (!UTILS.verifyEmail(email)) {
+        if (!UtilityFunctions.verifyEmail(email)) {
             console.error('Invalid email');
-            return res.status(400).json({ success: false, msg: "Wrong email, contains disallowed characters!" });
+            return res.status(400).json({ success: false, message: "Wrong email, contains disallowed characters!" });
         }
 
         // Validate username format
-        if (!UTILS.verifyUsername(username)) {
+        if (!UtilityFunctions.verifyUsername(username)) {
             console.error('Invalid username');
-            return res.status(400).json({ success: false, msg: "Wrong username, contains disallowed characters!" });
+            return res.status(400).json({ success: false, message: "Wrong username, contains disallowed characters!" });
         }
 
         // Validate name and surname formats
-        if (!UTILS.verifyNameSurname(name, surname)) {
+        if (!UtilityFunctions.verifyNameSurname(firstName, lastName)) {
             console.error('Invalid name or surname');
-            return res.status(400).json({ success: false, msg: "Wrong name/surname, contains disallowed characters!" });
+            return res.status(400).json({ success: false, message: "Wrong name/surname, contains disallowed characters!" });
         }
 
         // Validate role
-        if (!UTILS.verifyRole(role)) {
+        if (!UtilityFunctions.verifyRole(userRole)) {
             console.error('Invalid role');
-            return res.status(400).json({ success: false, msg: "Wrong role, please try again." });
+            return res.status(400).json({ success: false, message: "Wrong role, please try again." });
         }
 
         // Check if passwords match
-        if (password !== password2) {
+        if (password !== confirmPassword) {
             console.error('Passwords do not match');
-            return res.status(401).json({ success: false, msg: "Passwords do not match!" });
+            return res.status(401).json({ success: false, message: "Passwords do not match!" });
         }
 
         try {
             // Check if email is already in use
-            const queryResultEmail = await DB.authEmail(email);
-            if (queryResultEmail.length > 0) {
+            const emailQueryResult = await Database.authEmail(email);
+            if (emailQueryResult.length > 0) {
                 console.error('Email already in use');
-                return res.status(400).json({ success: false, msg: "User with that E-mail already exists!" });
+                return res.status(400).json({ success: false, message: "User with that E-mail already exists!" });
             }
 
             // Check if username is already in use
-            const queryResultUsername = await DB.authUsername(username);
-            if (queryResultUsername.length > 0) {
+            const usernameQueryResult = await Database.authUsername(username);
+            if (usernameQueryResult.length > 0) {
                 console.error('Username already in use');
-                return res.status(400).json({ success: false, msg: "User with that Username already exists!" });
+                return res.status(400).json({ success: false, message: "User with that Username already exists!" });
             }
         } catch (error) {
             console.error('Error querying email or username:', error);
-            return res.status(503).json({ success: false, msg: "Error processing DB. Please try again later." });
+            return res.status(503).json({ success: false, message: "Error processing DB. Please try again later." });
         }
 
         // Check password strength
-        if (!UTILS.verifyPassStrength(password)) {
+        if (!UtilityFunctions.verifyPassStrength(password)) {
             console.error('Weak password');
-            return res.status(400).json({ success: false, msg: "Wrong password, check password strength!" });
+            return res.status(400).json({ success: false, message: "Wrong password, check password strength!" });
         }
 
         // Hash the password
         const hashedPassword = await bcrypt.hash(password, 10);
         if (!hashedPassword) {
             console.error('Error hashing password');
-            return res.status(500).json({ success: false, msg: "Error while processing password. Please try again later." });
+            return res.status(500).json({ success: false, message: "Error while processing password. Please try again later." });
         }
 
         try {
             // Add the new user to the database
-            const queryResult = await DB.addUser(name, surname, username, email, hashedPassword);
-            if (!(queryResult.affectedRows)) {
+            const userInsertResult = await Database.addUser(firstName, lastName, username, email, hashedPassword);
+            if (!(userInsertResult.affectedRows)) {
                 console.error('Failed to add user');
-                return res.status(500).json({ success: false, msg: "Error registering new user..." });
+                return res.status(500).json({ success: false, message: "Error registering new user..." });
             }
         } catch (error) {
             console.error('Error saving user in DB:', error);
-            return res.status(503).json({ success: false, msg: "Error while saving user in DB. Please try again later." });
+            return res.status(503).json({ success: false, message: "Error while saving user in DB. Please try again later." });
         }
 
         try {
             // Retrieve user ID by email
-            const userId = await DB.getIdByEmail(email);
-            if (!userId) {
+            const userIdResult = await Database.getIdByEmail(email);
+            if (!userIdResult) {
                 console.error('No user ID found');
-                return res.status(404).json({ success: false, msg: "No user found!" });
+                return res.status(404).json({ success: false, message: "No user found!" });
             }
 
             // Assign roles to the user based on the provided role
-            if (role === "both") {
-                const q1 = await DB.addRole("Helper", userId[0].id);
-                const q2 = await DB.addRole("Seeker", userId[0].id);
-                if (!(q1.affectedRows > 0 && q2.affectedRows > 0)) {
+            if (userRole === "both") {
+                const roleResult1 = await Database.addRole("Helper", userIdResult[0].id);
+                const roleResult2 = await Database.addRole("Seeker", userIdResult[0].id);
+                if (!(roleResult1.affectedRows > 0 && roleResult2.affectedRows > 0)) {
                     console.error('Failed to add both roles');
-                    return res.status(500).json({ success: false, msg: "Failed saving user role in DB" });
+                    return res.status(500).json({ success: false, message: "Failed saving user role in DB" });
                 }
             } else {
-                const q = await DB.addRole(role, userId[0].id);
-                if (!q.affectedRows) {
+                const roleResult = await Database.addRole(userRole, userIdResult[0].id);
+                if (!roleResult.affectedRows) {
                     console.error('Failed to add role');
-                    return res.status(500).json({ success: false, msg: "Failed saving user role in DB" });
+                    return res.status(500).json({ success: false, message: "Failed saving user role in DB" });
                 }
             }
         } catch (error) {
             console.error('Error processing user role:', error);
-            return res.status(503).json({ success: false, msg: "User saved, but failed processing role..." });
+            return res.status(503).json({ success: false, message: "User saved, but failed processing role..." });
         }
 
-        return res.status(200).json({ success: true, msg: "New user successfully registered." });
+        return res.status(200).json({ success: true, message: "New user successfully registered." });
     } catch (err) {
         console.error('Internal server error:', err);
-        return res.status(500).json({ success: false, msg: "Something happened internally! Please try again later." });
+        return res.status(500).json({ success: false, message: "Something happened internally! Please try again later." });
     }
 });
 
 // Check session route (for JWT)
-users.get('/auth', async (req, res) => {
+authRoutes.get('/auth', async (req, res) => {
     try {
         // Retrieve token from authorization header
-        const token = req.headers['authorization'];
-        if (!token) {
+        const authToken = req.headers['authorization'];
+        if (!authToken) {
             console.error('No token provided');
-            return res.status(401).json({ success: false, msg: "No token provided!" });
+            return res.status(401).json({ success: false, message: "No token provided!" });
         }
 
         try {
             // Verify the JWT token
-            const decoded = await new Promise((resolve, reject) => {
-                jwt.verify(token, JWT_SECRET_KEY, (err, decoded) => {
+            const decodedToken = await new Promise((resolve, reject) => {
+                jwt.verify(authToken, JWT_SECRET, (err, decoded) => {
                     if (err) return reject(err);
                     resolve(decoded);
                 });
             });
 
-            return res.status(200).json({ success: true, user: decoded.user, msg: "User is logged in!" });
+            return res.status(200).json({ success: true, user: decodedToken.user, message: "User is logged in!" });
         } catch (err) {
             console.error('Failed to authenticate token:', err);
-            return res.status(401).json({ success: false, msg: "Failed to authenticate token." });
+            return res.status(401).json({ success: false, message: "Failed to authenticate token." });
         }
     } catch (error) {
         console.error('Internal server error:', error);
-        return res.status(500).json({ success: false, msg: "Internal server error!" });
+        return res.status(500).json({ success: false, message: "Internal server error!" });
     }
 });
 
 // Logout route (JWT specific)
-users.post('/logout', (req, res) => {
+authRoutes.post('/logout', (req, res) => {
     // JWT-based logout is typically handled on the client-side by deleting the token
-    return res.status(200).json({ success: true, msg: "Logout successful. Please delete the token on the client-side." });
+    return res.status(200).json({ success: true, message: "Logout successful. Please delete the token on the client-side." });
 });
 
-module.exports = users;
+module.exports = authRoutes;
