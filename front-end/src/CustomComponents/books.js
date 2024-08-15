@@ -48,11 +48,12 @@ class Books extends Component {
     };
   }
 
+  // Lifecycle method to fetch comments when the component mounts
   componentDidMount() {
     this.fetchComments();
   }
 
-  // Fetches comments from the server
+  // Fetches comments from the server and updates the state
   fetchComments = () => {
     axios.get(`${API_URL}/comments`)
       .then(res => {
@@ -73,14 +74,14 @@ class Books extends Component {
     this.setState({ title: event.target.value });
   };
 
-  // Updates the rating and toggles between a selected rating and no rating
+  // Updates the rating or resets it if the same rating is selected
   changeRating = (newRating) => {
     this.setState((prevState) => ({
       rating: prevState.rating === newRating ? 0 : newRating
     }));
   };
 
-  // Saves or updates a comment
+  // Saves a new comment or updates an existing comment
   saveComment = () => {
     const { comment, title, rating, editMode, currentCommentId } = this.state;
 
@@ -89,24 +90,24 @@ class Books extends Component {
       return;
     }
 
+    const data = { comment, title, rating };
+
     if (editMode) {
       // Update existing comment
-      axios.put(`${API_URL}/comments/${currentCommentId}`, { comment, title, rating })
+      axios.put(`${API_URL}/comments/${currentCommentId}`, data)
         .then(res => {
           console.log("Comment updated:", res.data);
-          this.setState({ comment: "", title: "", rating: 0, editMode: false, currentCommentId: null });
-          this.fetchComments();
+          this.resetForm();
         })
         .catch(err => {
           console.error("Error updating comment:", err);
         });
     } else {
       // Save new comment
-      axios.post(`${API_URL}/saveComment`, { comment, title, rating })
+      axios.post(`${API_URL}/saveComment`, data)
         .then(res => {
           console.log("Comment saved:", res.data);
-          this.setState({ comment: "", title: "", rating: 0 });
-          this.fetchComments();
+          this.resetForm();
         })
         .catch(err => {
           console.error("Error saving comment:", err);
@@ -125,7 +126,7 @@ class Books extends Component {
     });
   };
 
-  // Deletes a comment
+  // Deletes a comment and refetches the comments list
   deleteComment = (commentId) => {
     axios.delete(`${API_URL}/comments/${commentId}`)
       .then(res => {
@@ -135,6 +136,12 @@ class Books extends Component {
       .catch(err => {
         console.error("Error deleting comment:", err);
       });
+  };
+
+  // Resets the form to its initial state
+  resetForm = () => {
+    this.setState({ comment: "", title: "", rating: 0, editMode: false, currentCommentId: null });
+    this.fetchComments(); // Refresh the comments list
   };
 
   render() {
