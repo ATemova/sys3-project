@@ -326,13 +326,13 @@ class Category extends React.Component {
                     <button
                         className="btn btn-danger"
                         style={{
-                            position: "absolute",
-                            top: "20px",
-                            right: "20px",
+                            position: "fixed",
+                            left: "10px",
+                            bottom: "10px",
                             padding: "10px 20px",
                             fontSize: "16px",
-                            backgroundColor: "#d9534f",
-                            border: "2px solid #d9534f",
+                            backgroundColor: "#003f5c",
+                            border: "2px solid #003f5c",
                             color: "#ffffff",
                             borderRadius: "5px"
                         }}
