@@ -20,19 +20,20 @@ class LoginView extends React.Component {
     };
   }
 
+  // This method runs after the component is first added to the DOM
   componentDidMount() {
     // Check if there are stored credentials in localStorage
     const storedUsername = localStorage.getItem('username');
     const storedPassword = localStorage.getItem('password');
     const storedRememberMe = localStorage.getItem('remember_me');
 
+    // If stored credentials are found, populate the state with these values
     if (storedUsername && storedPassword && storedRememberMe) {
-      // Populate state with stored credentials if available
       this.setState({
         user_input: {
           username: storedUsername,
           password: storedPassword,
-          remember_me: JSON.parse(storedRememberMe)
+          remember_me: JSON.parse(storedRememberMe) // Parse stored "remember me" value from string to boolean
         }
       });
     }
@@ -43,7 +44,7 @@ class LoginView extends React.Component {
     this.setState({
       user_input: {
         ...this.state.user_input,
-        [e.target.name]: e.target.value
+        [e.target.name]: e.target.value // Use the input field's name attribute to update the corresponding state property
       }
     });
   }
@@ -53,7 +54,7 @@ class LoginView extends React.Component {
     this.setState({
       user_input: {
         ...this.state.user_input,
-        remember_me: e.target.checked
+        remember_me: e.target.checked // Update the remember_me property based on the checkbox state
       }
     });
   }
@@ -68,28 +69,30 @@ class LoginView extends React.Component {
       return;
     }
 
+    // Send POST request to the server with the login credentials
     axios.post(`${API_URL}/users/login`, { username, password })
       .then(response => {
         if (response.status === 200) {
           // Update state with server response
           this.setState({ status: response.data.status, user: response.data.user });
 
+          // Store or clear credentials in localStorage based on "remember me" checkbox
           if (remember_me) {
-            // Store user data in local storage if "remember me" is checked
             localStorage.setItem('username', username);
             localStorage.setItem('password', password);
-            localStorage.setItem('remember_me', JSON.stringify(remember_me));
+            localStorage.setItem('remember_me', JSON.stringify(remember_me)); // Store remember_me as string
           } else {
-            // Clear user data from local storage if "remember me" is not checked
             localStorage.removeItem('username');
             localStorage.removeItem('password');
             localStorage.removeItem('remember_me');
           }
         } else {
+          // Update state with an error message if the server response is not successful
           this.setState({ status: { success: false, msg: "Something went wrong, please try again." } });
         }
       })
       .catch(err => {
+        // Handle any errors that occur during the request
         this.setState({ status: { success: false, msg: "An error occurred. Please try again." } });
         console.error(err);
       });
@@ -175,7 +178,7 @@ class LoginView extends React.Component {
           </p>
         }
       </div>
-    )
+    );
   }
 }
 
