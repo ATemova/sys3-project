@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { HOME, CATEGORY, BOOKS, COMMENTS, SIGNUP, LOGIN, LOGOUT } from "./Utils/Constants";
 import Home from "./CustomComponents/home";
-import Category from "./CustomComponents/Category";
+import Category from "./CustomComponents/category";
 import Books from "./CustomComponents/Books";
 import Comments from "./CustomComponents/Comments";
 import SignupView from "./CustomComponents/SignupView";
