@@ -24,10 +24,10 @@ class Comments extends React.Component {
     this.setState({
       novica: {
         ...this.state.novica,
-        [e.target.name]: e.target.value,
+        [e.target.name]: e.target.value, // Dynamically update the specific field based on input name
       },
     });
-    console.log(this.state);
+    console.log(this.state); // Log the updated state for debugging purposes
   };
 
   // Handles file upload and updates state with the selected file
@@ -35,10 +35,10 @@ class Comments extends React.Component {
     this.setState({
       novica: {
         ...this.state.novica,
-        file: e.target.files[0],
+        file: e.target.files[0], // Set the selected file in the state
       },
     });
-    console.log(this.state);
+    console.log(this.state); // Log the updated state for debugging purposes
   };
 
   // Sends comment data to the server
@@ -46,17 +46,17 @@ class Comments extends React.Component {
     // Validate that title and text fields are not empty
     if (this.state.novica.title === "" || this.state.novica.text === "") {
       this.setState({
-        status: { success: false, msg: "Missing input field" },
+        status: { success: false, msg: "Missing input field" }, // Set error message if validation fails
       });
-      return;
+      return; // Exit the function if validation fails
     }
-    console.log("QPostNovica");
+    console.log("QPostNovica"); // Log the action for debugging purposes
 
     // Create FormData object to send file and text data
     const data = new FormData();
-    data.append("file", this.state.novica.file);
-    data.append("title", this.state.novica.title);
-    data.append("text", this.state.novica.text);
+    data.append("file", this.state.novica.file); // Append the file to FormData
+    data.append("title", this.state.novica.title); // Append the title to FormData
+    data.append("text", this.state.novica.text); // Append the text to FormData
 
     // Create an axios instance with a timeout and credentials
     let req = axios.create({
@@ -68,16 +68,16 @@ class Comments extends React.Component {
     req
       .post(API_URL + "/novice", data)
       .then((response) => {
-        this.setState({ status: response.data });
-        console.log("Sent to server...");
+        this.setState({ status: response.data }); // Update state with the server response
+        console.log("Sent to server..."); // Log the action for debugging purposes
       })
       .catch((err) => {
-        console.log(err);
+        console.log(err); // Log errors for debugging purposes
       });
   };
 
   render() {
-    const { success, msg } = this.state.status;
+    const { success, msg } = this.state.status; // Destructure status from state
     return (
       <div className="card" style={{ margin: "10px", minHeight: "50vh", padding: "20px" }}>
         <h3 style={{ margin: "10px" }}>Welcome user</h3>
@@ -88,7 +88,7 @@ class Comments extends React.Component {
           <input
             name="title"
             type="text"
-            onChange={this.QGetTextFromField}
+            onChange={this.QGetTextFromField} // Update state on input change
             className="form-control"
             placeholder="Title of the comment"
           />
@@ -100,7 +100,7 @@ class Comments extends React.Component {
           <textarea
             name="text"
             className="form-control"
-            onChange={this.QGetTextFromField}
+            onChange={this.QGetTextFromField} // Update state on input change
             rows="5" 
             placeholder="Write comment here"
           ></textarea>
@@ -109,11 +109,11 @@ class Comments extends React.Component {
         {/* Button to send the comment */}
         <button
           className="btn btn-primary"
-          onClick={this.QPostNovica}
+          onClick={this.QPostNovica} // Trigger comment posting on click
           style={{
             marginTop: "10px",
-            backgroundColor: "#003f5c",
-            borderColor: "#003f5c",
+            backgroundColor: "#003f5c", // Custom button color
+            borderColor: "#003f5c", // Custom button border color
           }}
         >
           Send
@@ -122,7 +122,7 @@ class Comments extends React.Component {
         {/* Display success or error messages */}
         {success !== null && (
           <p className={`alert ${success ? 'alert-success' : 'alert-danger'}`} role="alert">
-            {msg}
+            {msg} {/* Display the status message */}
           </p>
         )}
       </div>
