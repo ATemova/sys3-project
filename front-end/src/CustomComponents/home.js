@@ -13,15 +13,16 @@ class Home extends React.Component {
   // This method runs after the component is first added to the DOM
   componentDidMount() {
     // Fetch user data from the API
-    fetch(`${API_URL}/user`)
+    fetch(`${API_URL}/user`) // Use the API_URL to construct the API endpoint
       .then((response) => response.json()) // Parse the response as JSON
       .then((data) => {
+        // Check if the data contains the user's name
         if (data && data.name) {
           // Update the state with the user's name
           this.setState({ userName: data.name });
         }
       })
-      .catch((error) => console.error("Error fetching user data:", error)); // Handle any errors
+      .catch((error) => console.error("Error fetching user data:", error)); // Handle any errors that occur during the fetch operation
   }
 
   render() {
@@ -30,13 +31,8 @@ class Home extends React.Component {
         <div className="card-body">
           {/* Display a welcome message with the user's name */}
           <h5 className="card-title">Welcome, {this.state.userName}!</h5>
-          <p className="card-text">Welcome to BookFlow, your gateway to a world of knowledge and inspiration. Our extensive digital library 
-            offers a vast collection of resources tailored to fuel your intellectual curiosity and academic pursuits. Whether you're a student 
-            delving into your next research project or a professor seeking comprehensive materials for your courses. BookFlow has something for 
-            everyone.</p>
-          <p>Explore our diverse range of eBooks spanning countless subjects and disciplines. 
-            From classic literature to cutting-edge scientific research, you'll find the tools you need to learn, discover, and grow. 
-            Our user-friendly platform is designed to make your journey through the world of knowledge seamless and enjoyable.</p>
+          {/* Display a static message */}
+          <p className="card-text">You are in the online University library</p>
         </div>
       </div>
     );
