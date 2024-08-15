@@ -15,88 +15,80 @@ const cookies = new Cookies();
 class App extends Component {
   constructor(props) {
     super(props);
+    // Initialize component state
     this.state = {
-      CurrentPage: LOGIN, // Default page
+      CurrentPage: LOGIN, // Default page when the app loads
+      Novica: 1, // Example state, purpose depends on your implementation
       status: {
         success: null,
-        msg: ""
+        msg: "" // Stores status messages
       },
       user: null // Track user login state
     };
   }
 
   componentDidMount() {
-    this.checkSession();
-    this.setupAxiosInterceptors();
+    this.checkSession(); // Check session on component mount
   }
 
-  setupAxiosInterceptors = () => {
-    // Intercepting responses to handle session expiration or unauthorized access
-    axios.interceptors.response.use(
-      response => response,
-      error => {
-        if (error.response.status === 401) {
-          this.setState({ user: null, CurrentPage: LOGIN });
-          cookies.remove('session');
-        }
-        return Promise.reject(error);
-      }
-    );
-  };
-
+  // Check if a user session exists
   checkSession = async () => {
     try {
       const response = await axios.get(`${API_URL}/session`, { withCredentials: true });
       if (response.data.logged_in) {
-        this.setState({ user: response.data.user });
+        this.setState({ user: response.data.user }); // Set user state if logged in
       }
     } catch (error) {
-      console.error("Error checking session:", error);
+      console.error("Error checking session:", error); // Handle any errors
     }
   };
 
+  // Handle user logout
   handleLogout = async () => {
     try {
       const response = await axios.post(`${API_URL}/logout`, {}, { withCredentials: true });
       if (response.data.status.success) {
-        this.setState({ user: null });
-        this.QSetView({ page: HOME });
+        this.setState({ user: null }); // Clear user state on successful logout
+        this.QSetView({ page: HOME }); // Redirect to home page
       }
     } catch (error) {
-      console.error("Error logging out:", error);
+      console.error("Error logging out:", error); // Handle any errors
     }
   };
 
+  // Update user login status from child component
   QSetLoggedIn = (user) => {
-    this.setState({ user });
-    this.QSetView({ page: HOME });
+    this.setState({ user }); // Set user state when logged in
+    this.QSetView({ page: HOME }); // Redirect to home page
   };
 
-  QGetView = (state) => {
+  // Determines which component to render based on the current page state
+  QGetView(state) {
     const page = state.CurrentPage;
     switch (page) {
       case CATEGORY:
-        return <Category />;
+        return <Category />; // Render Category component
       case COMMENTS:
-        return <Comments />;
+        return <Comments />; // Render Comments component
       case BOOKS:
-        return <Books />;
+        return <Books />; // Render Books component
       case SIGNUP:
-        return <SignupView QUserFromChild={this.QSetLoggedIn} />;
+        return <SignupView QUserFromChild={this.QSetLoggedIn} />; // Pass callback to SignupView
       case LOGIN:
-        return <LoginView QUserFromChild={this.QSetLoggedIn} />;
+        return <LoginView QUserFromChild={this.QSetLoggedIn} />; // Pass callback to LoginView
       case LOGOUT:
-        return <Home />;
+        return <Home />; // Render Home component
       default:
-        return <Home />;
+        return <Home />; // Default to Home component if no valid page is found
     }
-  };
+  }
 
+  // Updates the current page and optionally other states
   QSetView = (obj) => {
     this.setState({
-      status: { success: null, msg: "" }, // Reset status
-      CurrentPage: obj.page,
-      Rating: obj.id || 0 // Set Rating if provided
+      status: { success: null, msg: "" }, // Reset status messages
+      CurrentPage: obj.page, // Update current page
+      Rating: obj.id || 0 // Set Rating if provided in the obj
     });
   };
 
@@ -109,7 +101,7 @@ class App extends Component {
           <nav className="navbar navbar-expand-lg navbar-dark" style={{ backgroundColor: '#003f5c' }}>
             <div className="container-fluid">
               <a
-                onClick={(e) => { e.preventDefault(); this.QSetView({ page: HOME }); }}
+                onClick={() => this.QSetView({ page: HOME })}
                 className="navbar-brand"
                 href="#"
               >
@@ -134,7 +126,7 @@ class App extends Component {
                 <ul className="navbar-nav me-auto mb-2 mb-lg-0">
                   <li className="nav-item">
                     <a
-                      onClick={(e) => { e.preventDefault(); this.QSetView({ page: CATEGORY }); }}
+                      onClick={() => this.QSetView({ page: CATEGORY })}
                       className="nav-link"
                       href="#"
                     >
@@ -144,7 +136,7 @@ class App extends Component {
 
                   <li className="nav-item">
                     <a
-                      onClick={(e) => { e.preventDefault(); this.QSetView({ page: BOOKS }); }}
+                      onClick={() => this.QSetView({ page: BOOKS })}
                       className="nav-link"
                       href="#"
                     >
@@ -154,7 +146,7 @@ class App extends Component {
 
                   <li className="nav-item">
                     <a
-                      onClick={(e) => { e.preventDefault(); this.QSetView({ page: COMMENTS }); }}
+                      onClick={() => this.QSetView({ page: COMMENTS })}
                       className="nav-link"
                       href="#"
                     >
@@ -166,7 +158,7 @@ class App extends Component {
                     <>
                       <li className="nav-item">
                         <a
-                          onClick={(e) => { e.preventDefault(); this.QSetView({ page: SIGNUP }); }}
+                          onClick={() => this.QSetView({ page: SIGNUP })}
                           className="nav-link"
                           href="#"
                         >
@@ -176,7 +168,7 @@ class App extends Component {
 
                       <li className="nav-item">
                         <a
-                          onClick={(e) => { e.preventDefault(); this.QSetView({ page: LOGIN }); }}
+                          onClick={() => this.QSetView({ page: LOGIN })}
                           className="nav-link"
                           href="#"
                         >
@@ -189,7 +181,7 @@ class App extends Component {
                   {user && (
                     <li className="nav-item">
                       <a
-                        onClick={(e) => { e.preventDefault(); this.handleLogout(); }}
+                        onClick={this.handleLogout}
                         className="nav-link"
                         href="#"
                       >
@@ -204,7 +196,7 @@ class App extends Component {
         </div>
 
         <div id="viewer" className="row container">
-          {this.QGetView(this.state)} {/* Render the appropriate component based on current page */}
+          {this.QGetView(this.state)} {/* Render the appropriate component based on the current page */}
         </div>
       </div>
     );
