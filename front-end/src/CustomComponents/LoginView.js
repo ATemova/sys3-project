@@ -5,14 +5,12 @@ import { API_URL } from "../Utils/Configuration";
 class LoginView extends React.Component {
   constructor(props) {
     super(props);
-    // Initialize component state
     this.state = {
       user_input: {
         username: "", // Stores the username input
         password: "", // Stores the password input
         remember_me: false // Stores whether the "remember me" checkbox is checked
       },
-      user: null, // Stores user data after successful login
       status: {
         success: null, // Indicates the success or failure of the login attempt
         msg: "" // Stores the status message
@@ -20,14 +18,12 @@ class LoginView extends React.Component {
     };
   }
 
-  // This method runs after the component is first added to the DOM
   componentDidMount() {
     // Check if there are stored credentials in localStorage
     const storedUsername = localStorage.getItem('username');
     const storedPassword = localStorage.getItem('password');
     const storedRememberMe = localStorage.getItem('remember_me');
 
-    // If stored credentials are found, populate the state with these values
     if (storedUsername && storedPassword && storedRememberMe) {
       this.setState({
         user_input: {
@@ -39,7 +35,6 @@ class LoginView extends React.Component {
     }
   }
 
-  // Updates state with the value of text input fields
   QGetTextFromField = (e) => {
     this.setState({
       user_input: {
@@ -49,7 +44,6 @@ class LoginView extends React.Component {
     });
   }
 
-  // Updates state with the checked state of the "remember me" checkbox
   QToggleCheckbox = (e) => {
     this.setState({
       user_input: {
@@ -59,8 +53,7 @@ class LoginView extends React.Component {
     });
   }
 
-  // Handles login logic and sends credentials to the server
-  QPostLogin = () => {
+  QPostLogin = async () => {
     const { username, password, remember_me } = this.state.user_input;
 
     // Validate that username and password are not empty
@@ -69,41 +62,42 @@ class LoginView extends React.Component {
       return;
     }
 
-    // Send POST request to the server with the login credentials
-    axios.post(`${API_URL}/users/login`, { username, password })
-      .then(response => {
-        if (response.status === 200) {
-          // Update state with server response
-          this.setState({ status: response.data });
+    try {
+      const response = await axios.post(`${API_URL}/users/login`, { username, password });
 
-          // Store or clear credentials in localStorage based on "remember me" checkbox
-          if (remember_me) {
-            localStorage.setItem('username', username);
-            localStorage.setItem('password', password);
-            localStorage.setItem('remember_me', JSON.stringify(remember_me)); // Store remember_me as string
-          } else {
-            localStorage.removeItem('username');
-            localStorage.removeItem('password');
-            localStorage.removeItem('remember_me');
-          }
+      if (response.status === 200) {
+        this.setState({ status: response.data });
+
+        // Store or clear credentials in localStorage based on "remember me" checkbox
+        if (remember_me) {
+          localStorage.setItem('username', username);
+          localStorage.setItem('password', password);
+          localStorage.setItem('remember_me', JSON.stringify(remember_me)); // Store remember_me as string
         } else {
-          // Update state with an error message if the server response is not successful
-          this.setState({ status: { success: false, msg: "Something went wrong, please try again." } });
+          localStorage.removeItem('username');
+          localStorage.removeItem('password');
+          localStorage.removeItem('remember_me');
         }
-      })
-      .catch(err => {
-        // Handle any errors that occur during the request
-        this.setState({ status: { success: false, msg: "An error occurred. Please try again." } });
-        console.error(err);
-      });
+
+        // Pass user data to parent component if a callback is provided
+        if (this.props.QUserFromChild) {
+          this.props.QUserFromChild(response.data.user);
+        }
+      } else {
+        this.setState({ status: { success: false, msg: "Something went wrong, please try again." } });
+      }
+    } catch (err) {
+      this.setState({ status: { success: false, msg: "An error occurred. Please try again." } });
+      console.error(err);
+    }
   }
 
   render() {
     const { user_input, status } = this.state;
 
     return (
-      <div className="card" style={{ width: "400px", margin: "10px auto" }}>
-        <form style={{ margin: "20px" }}>
+      <div className="card" style={{ width: "400px", margin: "10px auto", padding: "20px" }}>
+        <form>
           {/* Input for the username */}
           <div className="mb-3">
             <label className="form-label">Username</label>
@@ -113,7 +107,6 @@ class LoginView extends React.Component {
               type="text"
               className="form-control"
               value={user_input.username}
-              id="exampleInputEmail1"
             />
           </div>
           {/* Input for the password */}
@@ -125,7 +118,6 @@ class LoginView extends React.Component {
               type="password"
               className="form-control"
               value={user_input.password}
-              id="exampleInputPassword1"
             />
           </div>
           {/* Checkbox for "Remember me" */}
@@ -137,46 +129,31 @@ class LoginView extends React.Component {
               name="remember_me"
               onChange={this.QToggleCheckbox}
               checked={user_input.remember_me}
-              style={{
-                width: "20px",
-                height: "20px",
-                backgroundColor: "#003f5c",
-                border: "1px solid #003f5c",
-                borderRadius: "3px",
-                appearance: "none",
-                WebkitAppearance: "none",
-                MozAppearance: "none",
-                outline: "none",
-                cursor: "pointer"
-              }}
             />
-            <label className="form-check-label" htmlFor="rememberMe" style={{ marginLeft: "8px", cursor: "pointer" }}>
+            <label className="form-check-label" htmlFor="rememberMe">
               Remember me
             </label>
           </div>
         </form>
-        {/* Button to trigger login */}
         <button
-          style={{ margin: "10px", backgroundColor: '#003f5c', borderColor: '#003f5c' }}
+          style={{ marginTop: "10px", backgroundColor: '#003f5c', borderColor: '#003f5c' }}
           onClick={this.QPostLogin}
           className="btn btn-primary"
         >
           Log In
         </button>
 
-        {/* Display success or error messages */}
-        {status.success === true &&
+        {status.success === true && status.msg && (
           <p className="alert alert-success" role="alert">
             {status.msg}
           </p>
-        }
+        )}
 
-        {status.success === false &&
-          status.msg !== "" &&
+        {status.success === false && status.msg && (
           <p className="alert alert-danger" role="alert">
             {status.msg}
           </p>
-        }
+        )}
       </div>
     );
   }
