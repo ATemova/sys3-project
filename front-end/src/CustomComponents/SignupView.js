@@ -160,7 +160,7 @@ class SignupView extends React.Component {
           onClick={this.QPostSignup}
           className="btn btn-primary"
         >
-          Submit
+          Sign Up
         </button>
 
         {status.success === true && status.msg && (
