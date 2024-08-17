@@ -1,39 +1,27 @@
-const multer = require('multer');
 const express = require("express");
 const upload = express.Router();
 const DB = require('../db/dbConn.js');
 
-// Configure Multer's storage settings
-const storage = multer.diskStorage({
-    destination: (req, file, callBack) => {
-        // Set the destination folder for uploaded files
-        callBack(null, 'uploads');
-    },
-    filename: (req, file, callBack) => {
-        // Set the filename for uploaded files to their original name
-        // You might want to consider adding a unique identifier (like a timestamp) to prevent filename collisions
-        callBack(null, `${file.originalname}`);
-    }
-});
+// Handle POST requests (without file upload)
+upload.post('/', async (req, res, next) => {
+    // Handle the POST request logic here
 
-// Initialize Multer with the configured storage
-let upload_dest = multer({ storage: storage });
+    // Example: You could process data from req.body here
+    const data = req.body; // Assuming you're sending data in the request body
 
-// Handle file upload via POST request
-upload.post('/', upload_dest.single('file'), async (req, res, next) => {
-    // 'single' means it expects a single file upload under the form field named 'file'
-    const file = req.file; // Get the uploaded file information
+    // Log the received data to the console (for debugging)
+    console.log(data);
 
-    // Log the filename to the console (for debugging)
-    console.log(file.filename);
+    // Process the data or interact with the database as needed
+    try {
+        // Example: Assume you have a function in DB to process the data
+        const result = await DB.processData(data);
 
-    // Check if the file was uploaded successfully
-    if (!file) {
-        // Respond with an error message if no file was uploaded
-        res.send({ status: { success: false, msg: "Could not upload" } });
-    } else {
-        // Respond with a success message if the file was uploaded
-        res.send({ status: { success: true, msg: "File uploaded" } });
+        // Respond with a success message if everything went well
+        res.send({ status: { success: true, msg: "Data processed", result } });
+    } catch (err) {
+        // Respond with an error message if something went wrong
+        res.send({ status: { success: false, msg: "Could not process data", error: err.message } });
     }
 });
 
