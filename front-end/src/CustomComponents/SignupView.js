@@ -5,34 +5,31 @@ import { API_URL } from "../Utils/Configuration";
 class SignupView extends React.Component {
   constructor(props) {
     super(props);
-    // Initialize component state
     this.state = {
       user_input: {
-        username: "", // Stores the username input
-        email: "",    // Stores the email input
-        password: "", // Stores the password input
-        name: "",     // Stores the name input
-        surname: ""   // Stores the surname input
+        username: "",
+        email: "",
+        password: "",
+        name: "",
+        surname: ""
       },
       status: {
-        success: false, // Indicates if the registration was successful
-        msg: ""         // Stores status message
+        success: null,
+        msg: ""
       }
     };
   }
 
-  // Updates state with the value of text input fields
   QGetTextFromField = (e) => {
     this.setState({
       user_input: {
         ...this.state.user_input,
-        [e.target.name]: e.target.value // Update the corresponding field in user_input state
+        [e.target.name]: e.target.value
       }
     });
   }
 
-  // Handles the user registration logic
-  QPostSignup = () => {
+  QPostSignup = async () => {
     const { username, email, password, name, surname } = this.state.user_input;
 
     // Validate that all fields are filled
@@ -40,155 +37,143 @@ class SignupView extends React.Component {
       this.setState({
         status: {
           success: false,
-          msg: "Please fill in all fields." // Display error message if any field is empty
+          msg: "Please fill in all fields."
         }
       });
       return;
     }
 
-    // Send registration data to the server
-    axios.post(`${API_URL}/users/register`, {
-      username,
-      email,
-      password,
-      name,
-      surname
-    })
-      .then(response => {
-        if (response.status === 200) {
-          // Update state with success status and clear input fields
-          this.setState({
-            status: {
-              success: true,
-              msg: "User registered successfully." // Display success message upon successful registration
-            },
-            user_input: {
-              username: "",
-              email: "",
-              password: "",
-              name: "",
-              surname: ""
-            }
-          });
+    try {
+      const response = await axios.post(`${API_URL}/users/register`, {
+        username,
+        email,
+        password,
+        name,
+        surname
+      });
 
-          // Store user data in local storage for auto-login
-          localStorage.setItem('username', username);
-          localStorage.setItem('password', password);
-          localStorage.setItem('remember_me', JSON.stringify(true)); // Store "remember me" as true
-        } else {
-          // Handle failed registration
-          this.setState({
-            status: {
-              success: false,
-              msg: "Failed to register user." // Display error message if registration fails
-            }
-          });
+      if (response.status === 200) {
+        this.setState({
+          status: {
+            success: true,
+            msg: "User registered successfully."
+          },
+          user_input: {
+            username: "",
+            email: "",
+            password: "",
+            name: "",
+            surname: ""
+          }
+        });
+
+        // Optionally store user data for auto-login
+        localStorage.setItem('username', username);
+        localStorage.setItem('password', password);
+        localStorage.setItem('remember_me', JSON.stringify(true)); // Store "remember me" as true
+
+        // Call parent component method if provided
+        if (this.props.QUserFromChild) {
+          this.props.QUserFromChild(response.data.user);
         }
-      })
-      .catch(err => {
-        console.error(err);
-        // Handle errors during registration
+      } else {
         this.setState({
           status: {
             success: false,
-            msg: "An error occurred. Please try again later." // Display error message for unexpected errors
+            msg: "Failed to register user."
           }
         });
+      }
+    } catch (err) {
+      console.error(err);
+      this.setState({
+        status: {
+          success: false,
+          msg: "An error occurred. Please try again later."
+        }
       });
+    }
   }
 
   render() {
     const { user_input, status } = this.state;
 
     return (
-      <div className="card" style={{ width: "400px", margin: "10px auto" }}>
-        <form style={{ margin: "20px" }}>
-          {/* Input for the name */}
+      <div className="card" style={{ width: "400px", margin: "10px auto", padding: "20px" }}>
+        <form>
           <div className="mb-3">
             <label className="form-label">Name</label>
             <input
               name="name"
-              onChange={this.QGetTextFromField} // Update state on input change
+              onChange={this.QGetTextFromField}
               value={user_input.name}
               type="text"
               className="form-control"
-              id="exampleInputName"
             />
           </div>
-          {/* Input for the surname */}
           <div className="mb-3">
             <label className="form-label">Surname</label>
             <input
               name="surname"
-              onChange={this.QGetTextFromField} // Update state on input change
+              onChange={this.QGetTextFromField}
               value={user_input.surname}
               type="text"
               className="form-control"
-              id="exampleInputSurname"
             />
           </div>
-          {/* Input for the username */}
           <div className="mb-3">
             <label className="form-label">Username</label>
             <input
               name="username"
-              onChange={this.QGetTextFromField} // Update state on input change
+              onChange={this.QGetTextFromField}
               value={user_input.username}
               type="text"
               className="form-control"
-              id="exampleInputUsername"
             />
           </div>
-          {/* Input for the email address */}
           <div className="mb-3">
             <label className="form-label">Email address</label>
             <input
               name="email"
-              onChange={this.QGetTextFromField} // Update state on input change
+              onChange={this.QGetTextFromField}
               value={user_input.email}
               type="email"
               className="form-control"
-              id="exampleInputEmail"
-              aria-describedby="emailHelp"
             />
-            <div id="emailHelp" className="form-text">
+            <div className="form-text">
               Your email will never be shared with anyone else.
             </div>
           </div>
-          {/* Input for the password */}
           <div className="mb-3">
             <label className="form-label">Password</label>
             <input
               name="password"
-              onChange={this.QGetTextFromField} // Update state on input change
+              onChange={this.QGetTextFromField}
               value={user_input.password}
               type="password"
               className="form-control"
-              id="exampleInputPassword"
             />
           </div>
         </form>
-        {/* Button to submit the signup form */}
         <button
-          style={{ margin: "10px", backgroundColor: '#003f5c', borderColor: '#003f5c' }}
-          onClick={this.QPostSignup} // Trigger signup process on click
+          style={{ marginTop: "10px", backgroundColor: '#003f5c', borderColor: '#003f5c' }}
+          onClick={this.QPostSignup}
           className="btn btn-primary"
         >
           Submit
         </button>
 
-        {/* Display success or error messages */}
-        {status.success &&
+        {status.success === true && status.msg && (
           <p className="alert alert-success" role="alert">
-            {status.msg} {/* Display success message */}
+            {status.msg}
           </p>
-        }
+        )}
 
-        {!status.success && status.msg !== "" &&
+        {status.success === false && status.msg && (
           <p className="alert alert-danger" role="alert">
-            {status.msg} {/* Display error message */}
+            {status.msg}
           </p>
-        }
+        )}
       </div>
     );
   }
