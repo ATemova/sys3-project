@@ -33,7 +33,7 @@ authRoutes.post('/login', async (req, res) => {
         let userRecord;
         try {
             // Check if the username exists in the database
-            const userQueryResult = await Database.authUsername(username);
+            const userQueryResult = await Database.AuthUser(username);
             if (userQueryResult.length === 0) {
                 console.error('Username not found');
                 return res.status(404).json({ success: false, message: "Username does not exist. Please create a new account!" });
@@ -43,9 +43,11 @@ authRoutes.post('/login', async (req, res) => {
             console.error('Error querying username:', error);
             return res.status(503).json({ success: false, message: "Error while processing username. Please try again later." });
         }
-
         // Compare provided password with hashed password from database
+        console.log(password)
+        console.log(userRecord.password)
         const isPasswordCorrect = await bcrypt.compare(password, userRecord.password);
+        console.log("---")
         if (!isPasswordCorrect) {
             console.error('Incorrect password');
             return res.status(401).json({ success: false, message: "Incorrect password!" });
@@ -55,7 +57,7 @@ authRoutes.post('/login', async (req, res) => {
         const authToken = jwt.sign({ user: username }, JWT_SECRET, { expiresIn: '1h' });
 
         console.log("User successfully logged in!");
-        return res.status(200).json({ success: true, token: authToken, user: userRecord.username, message: "User is logged in!" });
+        return res.status(200).json({ success: true, token: authToken, user: userRecord.username, ms: "User is logged in!" });
     } catch (err) {
         console.error('Internal server error:', err);
         return res.status(500).json({ success: false, message: "Internal server error! Try again later." });
@@ -66,10 +68,10 @@ authRoutes.post('/login', async (req, res) => {
 authRoutes.post('/register', async (req, res) => {
     try {
         // Destructure registration details from request body
-        const { firstName, lastName, username, email, password, confirmPassword, userRole } = req.body;
+        const { name, surname, username, email, password } = req.body;
 
         // Check if all required fields are provided
-        if (!firstName || !lastName || !username || !email || !password || !confirmPassword || !userRole) {
+        if (!name || !surname || !username || !email || !password) {
             console.error('Missing input fields');
             return res.status(400).json({ success: false, message: "Input field missing! Please fill in all the fields." });
         }
@@ -87,41 +89,11 @@ authRoutes.post('/register', async (req, res) => {
         }
 
         // Validate name and surname formats
-        if (!UtilityFunctions.verifyNameSurname(firstName, lastName)) {
+        if (!UtilityFunctions.verifyNameSurname(name, surname)) {
             console.error('Invalid name or surname');
             return res.status(400).json({ success: false, message: "Wrong name/surname, contains disallowed characters!" });
         }
 
-        // Validate role
-        if (!UtilityFunctions.verifyRole(userRole)) {
-            console.error('Invalid role');
-            return res.status(400).json({ success: false, message: "Wrong role, please try again." });
-        }
-
-        // Check if passwords match
-        if (password !== confirmPassword) {
-            console.error('Passwords do not match');
-            return res.status(401).json({ success: false, message: "Passwords do not match!" });
-        }
-
-        try {
-            // Check if email is already in use
-            const emailQueryResult = await Database.authEmail(email);
-            if (emailQueryResult.length > 0) {
-                console.error('Email already in use');
-                return res.status(400).json({ success: false, message: "User with that E-mail already exists!" });
-            }
-
-            // Check if username is already in use
-            const usernameQueryResult = await Database.authUsername(username);
-            if (usernameQueryResult.length > 0) {
-                console.error('Username already in use');
-                return res.status(400).json({ success: false, message: "User with that Username already exists!" });
-            }
-        } catch (error) {
-            console.error('Error querying email or username:', error);
-            return res.status(503).json({ success: false, message: "Error processing DB. Please try again later." });
-        }
 
         // Check password strength
         if (!UtilityFunctions.verifyPassStrength(password)) {
@@ -138,7 +110,7 @@ authRoutes.post('/register', async (req, res) => {
 
         try {
             // Add the new user to the database
-            const userInsertResult = await Database.addUser(firstName, lastName, username, email, hashedPassword);
+            const userInsertResult = await Database.AddUser(name, surname, username, email, hashedPassword);
             if (!(userInsertResult.affectedRows)) {
                 console.error('Failed to add user');
                 return res.status(500).json({ success: false, message: "Error registering new user..." });
@@ -146,34 +118,6 @@ authRoutes.post('/register', async (req, res) => {
         } catch (error) {
             console.error('Error saving user in DB:', error);
             return res.status(503).json({ success: false, message: "Error while saving user in DB. Please try again later." });
-        }
-
-        try {
-            // Retrieve user ID by email
-            const userIdResult = await Database.getIdByEmail(email);
-            if (!userIdResult) {
-                console.error('No user ID found');
-                return res.status(404).json({ success: false, message: "No user found!" });
-            }
-
-            // Assign roles to the user based on the provided role
-            if (userRole === "both") {
-                const roleResult1 = await Database.addRole("Helper", userIdResult[0].id);
-                const roleResult2 = await Database.addRole("Seeker", userIdResult[0].id);
-                if (!(roleResult1.affectedRows > 0 && roleResult2.affectedRows > 0)) {
-                    console.error('Failed to add both roles');
-                    return res.status(500).json({ success: false, message: "Failed saving user role in DB" });
-                }
-            } else {
-                const roleResult = await Database.addRole(userRole, userIdResult[0].id);
-                if (!roleResult.affectedRows) {
-                    console.error('Failed to add role');
-                    return res.status(500).json({ success: false, message: "Failed saving user role in DB" });
-                }
-            }
-        } catch (error) {
-            console.error('Error processing user role:', error);
-            return res.status(503).json({ success: false, message: "User saved, but failed processing role..." });
         }
 
         return res.status(200).json({ success: true, message: "New user successfully registered." });
