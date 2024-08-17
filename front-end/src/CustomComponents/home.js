@@ -30,7 +30,7 @@ class Home extends React.Component {
       <div className="card" style={{ margin: "10px" }}>
         <div className="card-body">
           {/* Display a welcome message with the user's name */}
-          <h5 className="card-title">Welcome, {this.state.userName}!</h5>
+          <h5 className="card-title">Welcome User!</h5>
           {/* Display a static message */}
           <p className="card-text">Welcome to BookFlow, your digital gateway to a universe of knowledge and imagination! 
             Whether you are a professor or a student on the hunt for academic resources, our online library has something for everyone. 
