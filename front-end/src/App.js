@@ -5,6 +5,7 @@ import Books from "./CustomComponents/Books";
 import Comments from "./CustomComponents/Comments";
 import SignupView from "./CustomComponents/SignupView";
 import LoginView from "./CustomComponents/LoginView";
+import LogOutView from "./CustomComponents/LogOutView";
 import axios from "axios";
 import { API_URL } from "./Utils/Configuration";
 
@@ -18,7 +19,7 @@ class App extends Component {
   }
 
   componentDidMount() {
-    this.checkSession(); // Check session on mount
+    this.checkSession();
   }
 
   checkSession = async () => {
@@ -32,25 +33,17 @@ class App extends Component {
     }
   };
 
-  handleLogout = async () => {
-    try {
-      const response = await axios.post(`${API_URL}/logout`, {}, { withCredentials: true });
-      if (response.data.status && response.data.status.success) {
-        this.setState({ user: null }, () => {
-          this.QSetView({ page: 'HOME' });
-          window.location.reload(); // Ensures session data is fully cleared
-        });
-      } else {
-        console.error("Logout failed:", response.data);
-      }
-    } catch (error) {
-      console.error("Error logging out:", error);
-    }
+  handleLogout = () => {
+    this.setState({ CurrentPage: 'LOGOUT' });
+  };
+
+  handleLogoutSuccess = () => {
+    this.setState({ user: null, CurrentPage: 'HOME' });
   };
 
   QSetLoggedIn = (user) => {
     this.setState({ user }, () => {
-      this.QSetView({ page: 'HOME' });
+      this.setState({ CurrentPage: 'HOME' });
     });
   };
 
@@ -60,9 +53,9 @@ class App extends Component {
     });
   };
 
-  QGetView(state) {
-    const page = state.CurrentPage;
-    switch (page) {
+  QGetView() {
+    const { CurrentPage } = this.state;
+    switch (CurrentPage) {
       case 'CATEGORY':
         return <Category />;
       case 'COMMENTS':
@@ -73,6 +66,8 @@ class App extends Component {
         return <SignupView QUserFromChild={this.QSetLoggedIn} />;
       case 'LOGIN':
         return <LoginView QUserFromChild={this.QSetLoggedIn} />;
+      case 'LOGOUT':
+        return <LogOutView onLogoutSuccess={this.handleLogoutSuccess} />;
       default:
         return <Home />;
     }
@@ -144,7 +139,7 @@ class App extends Component {
           </div>
         </nav>
         <div id="viewer" className="row container">
-          {this.QGetView(this.state)}
+          {this.QGetView()}
         </div>
       </div>
     );
