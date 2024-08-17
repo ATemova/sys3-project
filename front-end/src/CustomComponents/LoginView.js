@@ -127,6 +127,8 @@ class LoginView extends React.Component {
               type="checkbox"
               id="rememberMe"
               name="remember_me"
+              backgroundColor="#003f5c"
+              borderColor="#003f5c"
               onChange={this.QToggleCheckbox}
               checked={user_input.remember_me}
             />
