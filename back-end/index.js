@@ -40,11 +40,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Routes
-const novice = require('./routes/novice');
+const reviews = require('./routes/reviews');
 const users = require('./routes/users');
 const upload = require('./routes/upload');
 
-app.use('/novice', novice);
+app.use('/reviews', reviews);
 app.use('/users', users);
 app.use('/uploadFile', upload);
 
