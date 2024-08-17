@@ -74,7 +74,7 @@ class LoginView extends React.Component {
       .then(response => {
         if (response.status === 200) {
           // Update state with server response
-          this.setState({ status: response.data.status, user: response.data.user });
+          this.setState({ status: response.data });
 
           // Store or clear credentials in localStorage based on "remember me" checkbox
           if (remember_me) {
