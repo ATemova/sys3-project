@@ -57,7 +57,7 @@ authRoutes.post('/login', async (req, res) => {
         const authToken = jwt.sign({ user: username }, JWT_SECRET, { expiresIn: '1h' });
 
         console.log("User successfully logged in!");
-        return res.status(200).json({ success: true, token: authToken, user: userRecord.username, ms: "User is logged in!" });
+        return res.status(200).json({ success: true, token: authToken, user: userRecord.username, msg: "User is logged in!" });
     } catch (err) {
         console.error('Internal server error:', err);
         return res.status(500).json({ success: false, message: "Internal server error! Try again later." });
