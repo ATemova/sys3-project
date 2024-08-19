@@ -20,6 +20,7 @@ class SignupView extends React.Component {
     };
   }
 
+  // Update state when input fields are changed
   QGetTextFromField = (e) => {
     this.setState({
       user_input: {
@@ -27,8 +28,9 @@ class SignupView extends React.Component {
         [e.target.name]: e.target.value
       }
     });
-  }
+  };
 
+  // Handle form submission and signup
   QPostSignup = async () => {
     const { username, email, password, name, surname } = this.state.user_input;
 
@@ -44,7 +46,8 @@ class SignupView extends React.Component {
     }
 
     try {
-      const response = await axios.post(`${API_URL}/users/register`, {
+      // Make POST request to the server
+      const response = await axios.post(`${API_URL}/register`, {
         username,
         email,
         password,
@@ -52,7 +55,7 @@ class SignupView extends React.Component {
         surname
       });
 
-      if (response.status === 200) {
+      if (response.status === 200 && response.data.success) {
         this.setState({
           status: {
             success: true,
@@ -67,25 +70,31 @@ class SignupView extends React.Component {
           }
         });
 
-        // Optionally store user data for auto-login
+        // Optionally store user data for auto-login or further processing
         localStorage.setItem('username', username);
         localStorage.setItem('password', password);
-        localStorage.setItem('remember_me', JSON.stringify(true)); // Store "remember me" as true
+        localStorage.setItem('remember_me', JSON.stringify(true));
 
         // Call parent component method if provided
         if (this.props.QUserFromChild) {
           this.props.QUserFromChild(response.data.user);
         }
+
+        // Redirect to login or dashboard after successful signup
+        setTimeout(() => {
+          this.props.history.push("/login");
+        }, 2000); // 2-second delay before redirect
       } else {
+        // Display error message from server response
         this.setState({
           status: {
             success: false,
-            msg: "Failed to register user."
+            msg: response.data.message || "Failed to register user."
           }
         });
       }
     } catch (err) {
-      console.error(err);
+      console.error("Error during registration:", err);
       this.setState({
         status: {
           success: false,
@@ -93,7 +102,7 @@ class SignupView extends React.Component {
         }
       });
     }
-  }
+  };
 
   render() {
     const { user_input, status } = this.state;
@@ -109,6 +118,7 @@ class SignupView extends React.Component {
               value={user_input.name}
               type="text"
               className="form-control"
+              required
             />
           </div>
           <div className="mb-3">
@@ -119,6 +129,7 @@ class SignupView extends React.Component {
               value={user_input.surname}
               type="text"
               className="form-control"
+              required
             />
           </div>
           <div className="mb-3">
@@ -129,6 +140,7 @@ class SignupView extends React.Component {
               value={user_input.username}
               type="text"
               className="form-control"
+              required
             />
           </div>
           <div className="mb-3">
@@ -139,6 +151,7 @@ class SignupView extends React.Component {
               value={user_input.email}
               type="email"
               className="form-control"
+              required
             />
             <div className="form-text">
               Your email will never be shared with anyone else.
@@ -152,6 +165,7 @@ class SignupView extends React.Component {
               value={user_input.password}
               type="password"
               className="form-control"
+              required
             />
           </div>
         </form>
@@ -163,16 +177,10 @@ class SignupView extends React.Component {
           Sign Up
         </button>
 
-        {status.success === true && status.msg && (
-          <p className="alert alert-success" role="alert">
+        {status.success !== null && (
+          <div className={`alert ${status.success ? 'alert-success' : 'alert-danger'}`} role="alert" style={{ marginTop: "10px" }}>
             {status.msg}
-          </p>
-        )}
-
-        {status.success === false && status.msg && (
-          <p className="alert alert-danger" role="alert">
-            {status.msg}
-          </p>
+          </div>
         )}
       </div>
     );
