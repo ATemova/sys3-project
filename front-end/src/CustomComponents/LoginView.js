@@ -20,9 +20,9 @@ class LoginView extends React.Component {
 
   componentDidMount() {
     // Check if there are stored credentials in localStorage
-    const storedUsername = localStorage.getItem('username');
-    const storedPassword = localStorage.getItem('password');
-    const storedRememberMe = localStorage.getItem('remember_me');
+    const storedUsername = localStorage.getItem("username");
+    const storedPassword = localStorage.getItem("password");
+    const storedRememberMe = localStorage.getItem("remember_me");
 
     if (storedUsername && storedPassword && storedRememberMe) {
       this.setState({
@@ -42,7 +42,7 @@ class LoginView extends React.Component {
         [e.target.name]: e.target.value // Use the input field's name attribute to update the corresponding state property
       }
     });
-  }
+  };
 
   QToggleCheckbox = (e) => {
     this.setState({
@@ -51,46 +51,53 @@ class LoginView extends React.Component {
         remember_me: e.target.checked // Update the remember_me property based on the checkbox state
       }
     });
-  }
+  };
 
   QPostLogin = async () => {
     const { username, password, remember_me } = this.state.user_input;
 
     // Validate that username and password are not empty
-    if (username === "" || password === "") {
-      this.setState({ status: { success: false, msg: "Missing input field" } });
+    if (!username || !password) {
+      this.setState({ status: { success: false, msg: "Please fill in both username and password." } });
       return;
     }
 
     try {
       const response = await axios.post(`${API_URL}/users/login`, { username, password });
 
-      if (response.status === 200) {
-        this.setState({ status: response.data });
+      if (response.status === 200 && response.data.success) {
+        this.setState({
+          status: { success: true, msg: "Login successful!" }
+        });
 
         // Store or clear credentials in localStorage based on "remember me" checkbox
         if (remember_me) {
-          localStorage.setItem('username', username);
-          localStorage.setItem('password', password);
-          localStorage.setItem('remember_me', JSON.stringify(remember_me)); // Store remember_me as string
+          localStorage.setItem("username", username);
+          localStorage.setItem("password", password);
+          localStorage.setItem("remember_me", JSON.stringify(remember_me)); // Store remember_me as string
         } else {
-          localStorage.removeItem('username');
-          localStorage.removeItem('password');
-          localStorage.removeItem('remember_me');
+          localStorage.removeItem("username");
+          localStorage.removeItem("password");
+          localStorage.removeItem("remember_me");
         }
 
         // Pass user data to parent component if a callback is provided
         if (this.props.QUserFromChild) {
           this.props.QUserFromChild(response.data.user);
         }
+
+        // Redirect to dashboard or another page after successful login
+        setTimeout(() => {
+          this.props.history.push("/dashboard"); // Adjust the route as needed
+        }, 2000); // 2-second delay before redirect
       } else {
-        this.setState({ status: { success: false, msg: "Something went wrong, please try again." } });
+        this.setState({ status: { success: false, msg: response.data.message || "Login failed. Please try again." } });
       }
     } catch (err) {
-      this.setState({ status: { success: false, msg: "An error occurred. Please try again." } });
-      console.error(err);
+      this.setState({ status: { success: false, msg: "An error occurred. Please try again later." } });
+      console.error("Error during login:", err);
     }
-  }
+  };
 
   render() {
     const { user_input, status } = this.state;
@@ -138,23 +145,18 @@ class LoginView extends React.Component {
           </div>
         </form>
         <button
-          style={{ marginTop: "10px", backgroundColor: '#003f5c', borderColor: '#003f5c' }}
+          style={{ marginTop: "10px", backgroundColor: "#003f5c", borderColor: "#003f5c" }}
           onClick={this.QPostLogin}
           className="btn btn-primary"
         >
           Log In
         </button>
 
-        {status.success === true && status.msg && (
-          <p className="alert alert-success" role="alert">
+        {/* Display success or error messages */}
+        {status.success !== null && (
+          <div className={`alert ${status.success ? "alert-success" : "alert-danger"}`} role="alert" style={{ marginTop: "10px" }}>
             {status.msg}
-          </p>
-        )}
-
-        {status.success === false && status.msg && (
-          <p className="alert alert-danger" role="alert">
-            {status.msg}
-          </p>
+          </div>
         )}
       </div>
     );

@@ -106,7 +106,7 @@ class App extends Component {
                     </li>
                     <li className="nav-item">
                       <a onClick={() => this.QSetView({ page: 'BOOKS' })} className="nav-link" href="#">
-                        Books
+                        Rating
                       </a>
                     </li>
                     <li className="nav-item">

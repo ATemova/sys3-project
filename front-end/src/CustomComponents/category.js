@@ -224,7 +224,7 @@ class Category extends React.Component {
 
     // Get color based on book name
     getBookColor = (bookName) => {
-        const colors = ["#003F5C", "#7FFFD4", "#FF0000", "#FFA500", "#800080"];
+        const colors = ["#003F5C", "#006400", "#FF0000", "#FFA500", "#800080"];
         return colors[bookName.length % colors.length];
     };
 
@@ -262,7 +262,7 @@ class Category extends React.Component {
                 {/* Display category selection if no category is selected */}
                 {!selectedCategory && !selectedBook ? (
                     <>
-                        <h1>Choose one of the libraries below</h1>
+                        <h1 style={{ color: "white" }}>Choose one of the libraries below</h1>
                         <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center" }}>
                             {Object.keys(subcategories).map((category) => (
                                 <div key={category} style={{ margin: "10px", flex: "0 0 calc(33.333% - 20px)" }}>
@@ -287,7 +287,7 @@ class Category extends React.Component {
                     </>
                 ) : !selectedSubcategory && !selectedBook ? (
                     <>
-                        <h3>Subcategories of {selectedCategory}:</h3>
+                        <h3 style={{ color: "white" }}>Subcategories of {selectedCategory}:</h3>
                         <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center" }}>
                             {Object.keys(subcategories[selectedCategory]).map((subcategory) => (
                                 <div key={subcategory} style={{ margin: "10px", flex: "0 0 calc(33.333% - 20px)" }}>
@@ -316,7 +316,7 @@ class Category extends React.Component {
                     </>
                 ) : !selectedDeeperSubcategory && !selectedBook ? (
                     <>
-                        <h3>{selectedSubcategory} Subcategories in {selectedCategory}:</h3>
+                        <h3 style={{ color: "white" }}>{selectedSubcategory} Subcategories in {selectedCategory}:</h3>
                         <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center" }}>
                             {Object.keys(subcategories[selectedCategory][selectedSubcategory]).map((deeperSubcategory) => (
                                 <div key={deeperSubcategory} style={{ margin: "10px", flex: "0 0 calc(33.333% - 20px)" }}>
@@ -347,7 +347,7 @@ class Category extends React.Component {
                     <>
                         {/* Display the selected book */}
                         <div style={{ margin: "20px" }}>
-                            <h3>Selected Book:</h3>
+                            <h3 style={{ color: "white" }}>Selected Book:</h3>
                             <div style={{ 
                                 textAlign: "center", 
                                 margin: "10px",
@@ -393,7 +393,7 @@ class Category extends React.Component {
                         </div>
 
                         {/* Display books */}
-                        <h3>Books in {selectedDeeperSubcategory}:</h3>
+                        <h3 style={{ color: "white" }}>Books in {selectedDeeperSubcategory}:</h3>
                         <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center" }}>
                             {this.filterBooks(books).map((book) => (
                                 <div key={book} style={{ margin: "10px", flex: "0 0 calc(25% - 20px)" }}>
