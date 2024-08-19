@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import Home from "./CustomComponents/home";
 import Category from "./CustomComponents/category";
 import Books from "./CustomComponents/Books";
-import Comments from "./CustomComponents/Comments";
 import SignupView from "./CustomComponents/SignupView";
 import LoginView from "./CustomComponents/LoginView";
 import LogOutView from "./CustomComponents/LogOutView";
@@ -58,8 +57,6 @@ class App extends Component {
     switch (CurrentPage) {
       case 'CATEGORY':
         return <Category />;
-      case 'COMMENTS':
-        return <Comments />;
       case 'BOOKS':
         return <Books />;
       case 'SIGNUP':
@@ -107,11 +104,6 @@ class App extends Component {
                     <li className="nav-item">
                       <a onClick={() => this.QSetView({ page: 'BOOKS' })} className="nav-link" href="#">
                         Rating
-                      </a>
-                    </li>
-                    <li className="nav-item">
-                      <a onClick={() => this.QSetView({ page: 'COMMENTS' })} className="nav-link" href="#">
-                        Comments
                       </a>
                     </li>
                     <li className="nav-item">
