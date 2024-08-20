@@ -44,19 +44,29 @@ function authenticateToken(req, res, next) {
 reviews.get('/', async (req, res) => {
     try {
         const queryResult = await DB.allReviews();
-        res.status(200).json({success: true, msg:"yers", comments: queryResult});
+        res.status(200).json({ success: true, msg: "Reviews fetched successfully.", reviews: queryResult });
     } catch (err) {
         console.error('Error fetching reviews:', err);
         res.status(500).json({ success: false, msg: "Internal server error." });
     }
 });
 
+reviews.get('/all-books', async (req, res) => {
+    try {
+        const queryResult = await DB.allBooks();
+        res.status(200).json({ success: true, msg: "Reviews fetched successfully.", books: queryResult });
+    } catch (err) {
+        console.error('Error fetching books:', err);
+        res.status(500).json({ success: false, msg: "Internal server error." });
+    }
+})
+
 // Get a single review by ID
 reviews.get('/:id', async (req, res) => {
     try {
         const queryResult = await DB.oneReview(req.params.id);
         if (queryResult.length > 0) {
-            res.status(200).json(queryResult[0]);
+            res.status(200).json({ success: true, review: queryResult[0] });
         } else {
             res.status(404).json({ success: false, msg: "Review not found." });
         }
@@ -68,36 +78,77 @@ reviews.get('/:id', async (req, res) => {
 
 // Add or update a review
 reviews.post('/', async (req, res) => {
+    console.log(req.body)
     try {
-        const { rating, comment, userId, user } = req.body;
+        const { rating, comment, postId, userId, boktorateid, user } = req.body;
 
-        if (!rating || !comment) {
-            return res.status(400).json({ success: false, msg: "Rating and comment are required." });
-        }
-        console.log(req.body)
-        const useridfromdataabse = await DB.AuthUser(user)
+        // if (!rating || !comment || !postId) {
+        //     return res.status(400).json({ success: false, msg: "Rating, comment, and postId are required." });
+        // }
 
-        const user_id = useridfromdataabse[0].id
+        // Check if the user has already submitted a review for this post
 
-        // Check if the user has already submitted a review
-        const existingReview = await DB.oneReview(userId);
+        const userr = await DB.AuthUser(user)
+        const user_id = userr[0].id
+
+        const existingReview = await DB.getReviewByUserAndPost(boktorateid, user_id);
+        
         let queryResult;
-
         if (existingReview.length > 0) {
-            queryResult = await DB.updateReview(user_id, rating, comment);
+            queryResult = await DB.updateReview(user_id, boktorateid, rating, comment);
         } else {
-            queryResult = await DB.createReview(user_id, rating, comment);
+            queryResult = await DB.createReview(user_id, boktorateid, rating, comment);
         }
 
         if (queryResult.affectedRows) {
-            console.log("Review successfully saved!");
             res.status(200).json({ success: true, msg: "Review saved successfully." });
         } else {
-            console.log("Failed to save the review.");
             res.status(500).json({ success: false, msg: "Failed to save review." });
         }
     } catch (err) {
         console.error('Error saving review:', err);
+        res.status(500).json({ success: false, msg: "Internal server error." });
+    }
+});
+
+// Update a review by ID
+reviews.put('/:id', authenticateToken, async (req, res) => {
+    try {
+        const reviewId = req.params.id;
+        const { rating, comment } = req.body;
+        const userId = req.user.id; // Use authenticated user's ID
+
+        if (!rating || !comment) {
+            return res.status(400).json({ success: false, msg: "Rating and comment are required." });
+        }
+
+        const queryResult = await DB.updateReviewById(reviewId, userId, rating, comment);
+
+        if (queryResult.affectedRows) {
+            res.status(200).json({ success: true, msg: "Review updated successfully." });
+        } else {
+            res.status(404).json({ success: false, msg: "Review not found or you are not authorized to update this review." });
+        }
+    } catch (err) {
+        console.error('Error updating review:', err);
+        res.status(500).json({ success: false, msg: "Internal server error." });
+    }
+});
+
+// Delete a review by ID
+reviews.delete('/:id', async (req, res) => {
+    try {
+        const reviewId = req.params.id;
+
+        const queryResult = await DB.deleteCommentByUserId(reviewId);
+
+        if (queryResult.affectedRows) {
+            res.status(200).json({ success: true, msg: "Review deleted successfully." });
+        } else {
+            res.status(404).json({ success: false, msg: "Review not found or you are not authorized to delete this review." });
+        }
+    } catch (err) {
+        console.error('Error deleting review:', err);
         res.status(500).json({ success: false, msg: "Internal server error." });
     }
 });
