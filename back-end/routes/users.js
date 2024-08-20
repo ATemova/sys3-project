@@ -89,13 +89,6 @@ authRoutes.post('/register', async (req, res) => {
             return res.status(400).json({ success: false, message: "Weak password, please ensure it meets the strength requirements!" });
         }
 
-        // Check if username or email already exists in the database
-        const existingUser = await Database.checkUserExists(username, email);
-        if (existingUser.length > 0) {
-            console.error('Username or email already in use');
-            return res.status(409).json({ success: false, message: "Username or email already in use!" });
-        }
-
         // Hash the password
         const hashedPassword = await bcrypt.hash(password, 10);
         if (!hashedPassword) {
@@ -117,29 +110,6 @@ authRoutes.post('/register', async (req, res) => {
     }
 });
 
-// Check session route (for JWT)
-authRoutes.get('/auth', (req, res) => {
-    try {
-        const authToken = req.headers['authorization'];
-        if (!authToken) {
-            console.error('No token provided');
-            return res.status(401).json({ success: false, message: "No token provided!" });
-        }
-
-        const token = authToken.split(' ')[1]; // Extract token from "Bearer <token>"
-        jwt.verify(token, JWT_SECRET, (err, decoded) => {
-            if (err) {
-                console.error('Failed to authenticate token:', err);
-                return res.status(401).json({ success: false, message: "Failed to authenticate token." });
-            }
-
-            return res.status(200).json({ success: true, user: decoded.user, message: "User is logged in!" });
-        });
-    } catch (error) {
-        console.error('Internal server error:', error);
-        return res.status(500).json({ success: false, message: "Internal server error!" });
-    }
-});
 
 // Logout route (JWT specific)
 authRoutes.post('/logout', (req, res) => {
