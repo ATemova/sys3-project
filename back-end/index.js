@@ -23,15 +23,12 @@ let sess = {
     }
 };
 
-if (process.env.NODE_ENV === 'production') {
-    app.set('trust proxy', 1); // Trust the first proxy when behind a reverse proxy like Nginx or Heroku
-}
 
 app.use(session(sess));
 
 // CORS configuration
 app.use(cors({
- methods:["GET", "POST"],
+ methods:["GET", "POST", "PUT"],
   credentials: true,
   origin: ['http://localhost:3000', 'http://localhost:3001']
 }));
