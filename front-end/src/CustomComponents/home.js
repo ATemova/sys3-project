@@ -11,19 +11,19 @@ class Home extends React.Component {
   }
 
   // This method runs after the component is first added to the DOM
-  componentDidMount() {
-    // Fetch user data from the API
-    fetch(`${API_URL}/user`) // Use the API_URL to construct the API endpoint
-      .then((response) => response.json()) // Parse the response as JSON
-      .then((data) => {
-        // Check if the data contains the user's name
-        if (data && data.name) {
-          // Update the state with the user's name
-          this.setState({ userName: data.name });
-        }
-      })
-      .catch((error) => console.error("Error fetching user data:", error)); // Handle any errors that occur during the fetch operation
-  }
+  // componentDidMount() {
+  //   // Fetch user data from the API
+  //   fetch(`${API_URL}/user`) // Use the API_URL to construct the API endpoint
+  //     .then((response) => response.json()) // Parse the response as JSON
+  //     .then((data) => {
+  //       // Check if the data contains the user's name
+  //       if (data && data.name) {
+  //         // Update the state with the user's name
+  //         this.setState({ userName: data.name });
+  //       }
+  //     })
+  //     .catch((error) => console.error("Error fetching user data:", error)); // Handle any errors that occur during the fetch operation
+  // }
 
   render() {
     return (

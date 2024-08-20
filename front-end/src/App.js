@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 import Home from "./CustomComponents/home";
 import Category from "./CustomComponents/category";
-import Books from "./CustomComponents/Books";
+// import Books from "./CustomComponents/Books"; // Ensure the path is correct
+import Rating from "./CustomComponents/Rating";
 import SignupView from "./CustomComponents/SignupView";
 import LoginView from "./CustomComponents/LoginView";
 import LogOutView from "./CustomComponents/LogOutView";
@@ -17,9 +18,7 @@ class App extends Component {
     };
   }
 
-  componentDidMount() {
-    this.checkSession();
-  }
+
 
   checkSession = async () => {
     try {
@@ -58,7 +57,7 @@ class App extends Component {
       case 'CATEGORY':
         return <Category />;
       case 'BOOKS':
-        return <Books />;
+        return <Rating />; // Ensure this reflects the correct component
       case 'SIGNUP':
         return <SignupView QUserFromChild={this.QSetLoggedIn} />;
       case 'LOGIN':

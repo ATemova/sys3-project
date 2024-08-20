@@ -146,7 +146,6 @@ class Category extends React.Component {
         };
     }
 
-    // Handler for selecting a category
     handleClick = (category) => {
         this.setState({ 
             selectedCategory: category, 
@@ -156,7 +155,6 @@ class Category extends React.Component {
         });
     };
 
-    // Handler for selecting a subcategory
     handleSubcategoryClick = (subcategory) => {
         this.setState({ 
             selectedSubcategory: subcategory, 
@@ -165,7 +163,6 @@ class Category extends React.Component {
         });
     };
 
-    // Handler for selecting a deeper subcategory or book
     handleDeeperSubcategoryClick = (deeperSubcategory) => {
         if (Array.isArray(this.state.subcategories[this.state.selectedCategory][this.state.selectedSubcategory])) {
             this.setState({ 
@@ -179,7 +176,6 @@ class Category extends React.Component {
         }
     };
 
-    // Handler for selecting a book
     handleBookClick = (bookName) => {
         this.setState({ 
             selectedBook: bookName,
@@ -189,18 +185,15 @@ class Category extends React.Component {
         });
     };
 
-    // Filter books based on search query
     filterBooks = (books) => {
         const { searchQuery } = this.state;
         return books.filter(book => book.toLowerCase().includes(searchQuery.toLowerCase()));
     };
 
-    // Handle search query change
     handleSearchChange = (e) => {
         this.setState({ searchQuery: e.target.value });
     };
 
-    // Go back to the previous view
     handleBack = () => {
         if (this.state.selectedBook) {
             this.setState({ 
@@ -222,13 +215,11 @@ class Category extends React.Component {
         }
     };
 
-    // Get color based on book name
     getBookColor = (bookName) => {
         const colors = ["#003F5C", "#006400", "#FF0000", "#FFA500", "#800080"];
         return colors[bookName.length % colors.length];
     };
 
-    // Render individual book item
     renderBook = (book) => (
         <div 
             key={book}
@@ -243,7 +234,8 @@ class Category extends React.Component {
                 height: "100px",
                 display: "flex",
                 alignItems: "center",
-                justifyContent: "center"
+                justifyContent: "center",
+                boxSizing: "border-box"
             }}
             onClick={() => this.handleBookClick(book)}
         >
@@ -258,7 +250,7 @@ class Category extends React.Component {
             : [];
 
         return (
-            <div style={{ textAlign: "center", position: "relative", minHeight: "100vh" }}>
+            <div style={{ textAlign: "center", position: "relative", minHeight: "100vh", paddingBottom: "50px" }}>
                 {/* Display category selection if no category is selected */}
                 {!selectedCategory && !selectedBook ? (
                     <>
@@ -345,7 +337,6 @@ class Category extends React.Component {
                     </>
                 ) : selectedBook ? (
                     <>
-                        {/* Display the selected book */}
                         <div style={{ margin: "20px" }}>
                             <h3 style={{ color: "white" }}>Selected Book:</h3>
                             <div style={{ 
@@ -358,13 +349,13 @@ class Category extends React.Component {
                                 <div style={{ 
                                     width: "80%", 
                                     height: "200px",
-                                    backgroundColor: this.getBookColor(selectedBook), 
+                                    backgroundColor: this.getBookColor(selectedBook),
                                     color: "white", 
                                     borderRadius: "10px", 
                                     display: "flex", 
                                     alignItems: "center", 
                                     justifyContent: "center", 
-                                    fontSize: "24px", // Larger font size
+                                    fontSize: "24px",
                                     fontWeight: "bold", 
                                     boxSizing: "border-box",
                                 }}>
@@ -375,8 +366,7 @@ class Category extends React.Component {
                     </>
                 ) : (
                     <>
-                        {/* Display search input */}
-                        <div style={{ margin: "20px 0" }}>
+                        <div style={{ margin: "20px" }}>
                             <input
                                 type="text"
                                 placeholder="Search books..."
@@ -384,47 +374,44 @@ class Category extends React.Component {
                                 onChange={this.handleSearchChange}
                                 style={{
                                     padding: "10px",
+                                    width: "80%",
                                     fontSize: "16px",
-                                    border: "1px solid #ccc",
-                                    borderRadius: "5px",
-                                    width: "300px"
+                                    border: "2px solid #003f5c",
+                                    borderRadius: "5px"
                                 }}
                             />
                         </div>
-
-                        {/* Display books */}
                         <h3 style={{ color: "white" }}>Books in {selectedDeeperSubcategory}:</h3>
-                        <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center" }}>
-                            {this.filterBooks(books).map((book) => (
-                                <div key={book} style={{ margin: "10px", flex: "0 0 calc(25% - 20px)" }}>
-                                    {this.renderBook(book)}
-                                </div>
-                            ))}
+                        <div style={{ 
+                            display: "grid",
+                            gridTemplateColumns: "repeat(4, 1fr)",
+                            gap: "10px",
+                            justifyContent: "center",
+                            padding: "0 10px",
+                        }}>
+                            {this.filterBooks(books).map((book) => this.renderBook(book))}
                         </div>
                     </>
                 )}
 
-                {/* Display the current path */}
-                {selectedBook && (
-                    <button
-                        className="btn btn-danger"
-                        style={{
-                            position: "fixed",
-                            bottom: "10px",
-                            left: "10px",
-                            padding: "10px",
-                            fontSize: "16px",
-                            backgroundColor: "#003f5c",
-                            border: "2px solid #003f5c",
-                            color: "#ffffff",
-                            borderRadius: "8px",
-                            zIndex: 1000
-                        }}
-                        onClick={this.handleBack}
-                    >
-                        Back
-                    </button>
-                )}
+                <button
+                    onClick={this.handleBack}
+                    style={{
+                        position: "fixed",  // Use 'fixed' to keep it in place regardless of scrolling
+                        bottom: "10px",     // Distance from the bottom of the viewport
+                        left: "10px",       // Distance from the left of the viewport
+                        padding: "10px",
+                        backgroundColor: "#003f5c",
+                        border: "none",
+                        color: "#ffffff",
+                        borderRadius: "5px",
+                        cursor: "pointer",
+                        zIndex: 1000        // Ensures the button is above other content
+                    }}
+                >
+                    Back
+                </button>
+
             </div>
         );
     }
