@@ -28,7 +28,7 @@ app.use(session(sess));
 
 // CORS configuration
 app.use(cors({
- methods:["GET", "POST", "PUT"],
+ methods:["GET", "POST", "DELETE"],
   credentials: true,
   origin: ['http://localhost:3000', 'http://localhost:3001']
 }));
