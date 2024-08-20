@@ -14,7 +14,7 @@ if (!JWT_SECRET) {
 // Configure multer storage settings
 const storage = multer.diskStorage({
     destination: (req, file, callBack) => {
-        callBack(null, 'uploads');
+        callBack(null, 'uploads'); // Set the directory for file uploads
     },
     filename: (req, file, callBack) => {
         callBack(null, `${Date.now()}_${file.originalname}`); // Prepend timestamp to avoid file name conflicts
@@ -51,15 +51,16 @@ reviews.get('/', async (req, res) => {
     }
 });
 
+// Get all books
 reviews.get('/all-books', async (req, res) => {
     try {
         const queryResult = await DB.allBooks();
-        res.status(200).json({ success: true, msg: "Reviews fetched successfully.", books: queryResult });
+        res.status(200).json({ success: true, msg: "Books fetched successfully.", books: queryResult });
     } catch (err) {
         console.error('Error fetching books:', err);
         res.status(500).json({ success: false, msg: "Internal server error." });
     }
-})
+});
 
 // Get a single review by ID
 reviews.get('/:id', async (req, res) => {
@@ -78,25 +79,21 @@ reviews.get('/:id', async (req, res) => {
 
 // Add or update a review
 reviews.post('/', async (req, res) => {
-    console.log(req.body)
     try {
         const { rating, comment, postId, userId, boktorateid, user } = req.body;
-
-        // if (!rating || !comment || !postId) {
-        //     return res.status(400).json({ success: false, msg: "Rating, comment, and postId are required." });
-        // }
+        // Check if the user exists and get their ID
+        const userr = await DB.AuthUser(user);
+        const user_id = userr[0].id;
 
         // Check if the user has already submitted a review for this post
-
-        const userr = await DB.AuthUser(user)
-        const user_id = userr[0].id
-
         const existingReview = await DB.getReviewByUserAndPost(boktorateid, user_id);
-        
+
         let queryResult;
         if (existingReview.length > 0) {
+            // Update existing review
             queryResult = await DB.updateReview(user_id, boktorateid, rating, comment);
         } else {
+            // Create new review
             queryResult = await DB.createReview(user_id, boktorateid, rating, comment);
         }
 
