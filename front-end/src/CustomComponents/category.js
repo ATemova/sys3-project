@@ -146,7 +146,6 @@ class Category extends React.Component {
         };
     }
 
-    // Handler for category click
     handleClick = (category) => {
         this.setState({ 
             selectedCategory: category, 
@@ -156,7 +155,6 @@ class Category extends React.Component {
         });
     };
 
-    // Handler for subcategory click
     handleSubcategoryClick = (subcategory) => {
         this.setState({ 
             selectedSubcategory: subcategory, 
@@ -165,10 +163,8 @@ class Category extends React.Component {
         });
     };
 
-    // Handler for deeper subcategory click
     handleDeeperSubcategoryClick = (deeperSubcategory) => {
         if (Array.isArray(this.state.subcategories[this.state.selectedCategory][this.state.selectedSubcategory])) {
-            // If deeper subcategory is actually a list of books
             this.setState({ 
                 selectedBook: deeperSubcategory 
             });
@@ -180,7 +176,6 @@ class Category extends React.Component {
         }
     };
 
-    // Handler for book click
     handleBookClick = (bookName) => {
         this.setState({ 
             selectedBook: bookName,
@@ -190,50 +185,41 @@ class Category extends React.Component {
         });
     };
 
-    // Filters the books based on the search query
     filterBooks = (books) => {
         const { searchQuery } = this.state;
         return books.filter(book => book.toLowerCase().includes(searchQuery.toLowerCase()));
     };
 
-    // Handler for search input change
     handleSearchChange = (e) => {
         this.setState({ searchQuery: e.target.value });
     };
 
-    // Handler for back navigation
     handleBack = () => {
         if (this.state.selectedBook) {
-            // If a book is selected, go back to the deeper subcategory
             this.setState({ 
                 selectedBook: null, 
                 selectedDeeperSubcategory: null 
             });
         } else if (this.state.selectedDeeperSubcategory) {
-            // If a deeper subcategory is selected, go back to the subcategory
             this.setState({ 
                 selectedDeeperSubcategory: null 
             });
         } else if (this.state.selectedSubcategory) {
-            // If a subcategory is selected, go back to the category
             this.setState({ 
                 selectedSubcategory: null 
             });
         } else if (this.state.selectedCategory) {
-            // If a category is selected, go back to the main category view
             this.setState({ 
                 selectedCategory: null 
             });
         }
     };
 
-    // Determines the color of the book based on its name
     getBookColor = (bookName) => {
         const colors = ["#003F5C", "#006400", "#FF0000", "#FFA500", "#800080"];
         return colors[bookName.length % colors.length];
     };
 
-    // Renders a book with a specific color
     renderBook = (book) => (
         <div 
             key={book}
@@ -259,14 +245,50 @@ class Category extends React.Component {
 
     render() {
         const { selectedCategory, selectedSubcategory, selectedDeeperSubcategory, selectedBook, subcategories } = this.state;
-        // Determine the list of books based on the current selections
         const books = selectedCategory && selectedSubcategory && selectedDeeperSubcategory
             ? subcategories[selectedCategory][selectedSubcategory][selectedDeeperSubcategory] || []
             : [];
 
         return (
             <div style={{ textAlign: "center", position: "relative", minHeight: "100vh", paddingBottom: "50px" }}>
-                {/* Display category selection if no category is selected */}
+                <input
+                    type="text"
+                    placeholder="Search..."
+                    value={this.state.searchQuery}
+                    onChange={this.handleSearchChange}
+                    style={{
+                        marginTop: "20px",
+                        padding: "10px",
+                        fontSize: "16px",
+                        borderRadius: "5px",
+                        border: "1px solid #ddd",
+                        outline: "none",
+                        position: "relative",
+                        zIndex: 1
+                    }}
+                />
+                {selectedCategory || selectedSubcategory || selectedDeeperSubcategory || selectedBook ? (
+                    <button 
+                        className="btn btn-danger"
+                        style={{
+                            position: "fixed",
+                            bottom: "20px",
+                            left: "20px",
+                            padding: "10px",
+                            fontSize: "16px",
+                            backgroundColor: "#003f5c",
+                            border: "2px solid #003f5c",
+                            color: "#ffffff",
+                            borderRadius: "5px",
+                            cursor: "pointer",
+                            display: "block"
+                        }}
+                        onClick={this.handleBack}
+                    >
+                        Back
+                    </button>
+                ) : null}
+                
                 {!selectedCategory && !selectedBook ? (
                     <>
                         <h1 style={{ color: "white" }}>Choose one of the libraries below</h1>
@@ -359,10 +381,8 @@ class Category extends React.Component {
                                 fontSize: "20px",
                                 backgroundColor: "#003f5c",
                                 color: "white",
-                                padding: "10px",
-                                borderRadius: "5px",
-                                cursor: "pointer",
-                                display: "inline-block"
+                                padding: "20px",
+                                borderRadius: "5px"
                             }}>
                                 {selectedBook}
                             </div>
@@ -370,7 +390,9 @@ class Category extends React.Component {
                         <button 
                             className="btn btn-danger"
                             style={{
-                                width: "100px",
+                                position: "fixed",
+                                bottom: "20px",
+                                left: "20px",
                                 padding: "10px",
                                 fontSize: "16px",
                                 backgroundColor: "#003f5c",
@@ -378,8 +400,7 @@ class Category extends React.Component {
                                 color: "#ffffff",
                                 borderRadius: "5px",
                                 cursor: "pointer",
-                                display: "block",
-                                margin: "20px auto"
+                                display: "block"
                             }}
                             onClick={this.handleBack}
                         >
@@ -389,26 +410,21 @@ class Category extends React.Component {
                 ) : (
                     <>
                         <h3 style={{ color: "white" }}>Books in {selectedDeeperSubcategory}:</h3>
-                        <input
-                            type="text"
-                            placeholder="Search books..."
-                            value={this.state.searchQuery}
-                            onChange={this.handleSearchChange}
-                            style={{
-                                width: "300px",
-                                padding: "10px",
-                                marginBottom: "20px",
-                                borderRadius: "5px",
-                                border: "1px solid #ccc"
-                            }}
-                        />
-                        <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center" }}>
-                            {this.filterBooks(books).map((book) => this.renderBook(book))}
+                        <div style={{ 
+                            display: "grid",
+                            gridTemplateColumns: "repeat(4, 1fr)",
+                            gap: "10px",
+                            margin: "0 auto",
+                            maxWidth: "1200px"
+                        }}>
+                            {this.filterBooks(books).map(this.renderBook)}
                         </div>
                         <button 
                             className="btn btn-danger"
                             style={{
-                                width: "100px",
+                                position: "fixed",
+                                bottom: "20px",
+                                left: "20px",
                                 padding: "10px",
                                 fontSize: "16px",
                                 backgroundColor: "#003f5c",
@@ -416,8 +432,7 @@ class Category extends React.Component {
                                 color: "#ffffff",
                                 borderRadius: "5px",
                                 cursor: "pointer",
-                                display: "block",
-                                margin: "20px auto"
+                                display: "block"
                             }}
                             onClick={this.handleBack}
                         >
