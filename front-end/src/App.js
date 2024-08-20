@@ -12,14 +12,14 @@ import { API_URL } from "./Utils/Configuration";
 class App extends Component {
   constructor(props) {
     super(props);
+    // Initialize component state with default page and user state
     this.state = {
-      CurrentPage: 'LOGIN', // Default page
+      CurrentPage: 'LOGIN', // Default page to show initially
       user: null // Track user login state
     };
   }
 
-
-
+  // Check if the user session is still valid
   checkSession = async () => {
     try {
       const response = await axios.get(`${API_URL}/session`, { withCredentials: true });
@@ -31,26 +31,31 @@ class App extends Component {
     }
   };
 
+  // Handle user logout
   handleLogout = () => {
-    this.setState({ CurrentPage: 'LOGOUT' });
+    this.setState({ CurrentPage: 'LOGOUT' }); // Switch to logout page
   };
 
+  // Handle successful logout and redirect to home page
   handleLogoutSuccess = () => {
     this.setState({ user: null, CurrentPage: 'HOME' });
   };
 
+  // Set the logged-in user and redirect to the home page
   QSetLoggedIn = (user) => {
     this.setState({ user }, () => {
       this.setState({ CurrentPage: 'HOME' });
     });
   };
 
+  // Update the current view based on the selected page
   QSetView = (obj) => {
     this.setState({
       CurrentPage: obj.page
     });
   };
 
+  // Determine which component to render based on the current page
   QGetView() {
     const { CurrentPage } = this.state;
     switch (CurrentPage) {
@@ -83,6 +88,7 @@ class App extends Component {
           minHeight: '100vh'
         }}
       >
+        {/* Navigation bar */}
         <nav className="navbar navbar-expand-lg navbar-dark" style={{ backgroundColor: '#003f5c' }}>
           <div className="container-fluid">
             <a onClick={() => this.QSetView({ page: 'HOME' })} className="navbar-brand" href="#">
@@ -95,6 +101,7 @@ class App extends Component {
               <ul className="navbar-nav me-auto mb-2 mb-lg-0">
                 {user ? (
                   <>
+                    {/* Navigation links for logged-in users */}
                     <li className="nav-item">
                       <a onClick={() => this.QSetView({ page: 'CATEGORY' })} className="nav-link" href="#">
                         Category
@@ -113,6 +120,7 @@ class App extends Component {
                   </>
                 ) : (
                   <>
+                    {/* Navigation links for unauthenticated users */}
                     <li className="nav-item">
                       <a onClick={() => this.QSetView({ page: 'SIGNUP' })} className="nav-link" href="#">
                         Sign up
@@ -129,8 +137,9 @@ class App extends Component {
             </div>
           </div>
         </nav>
+        {/* Main content area */}
         <div id="viewer" className="row container">
-          {this.QGetView()}
+          {this.QGetView()} {/* Render the appropriate component based on state */}
         </div>
       </div>
     );
