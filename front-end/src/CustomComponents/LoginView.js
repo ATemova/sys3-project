@@ -1,10 +1,11 @@
 import React from "react";
 import axios from "axios";
-import { API_URL } from "../Utils/Configuration";
+import { API_URL } from "../Utils/Configuration"; // Import API URL for making HTTP requests
 
 class LoginView extends React.Component {
   constructor(props) {
     super(props);
+    // Initialize component state
     this.state = {
       user_input: {
         username: "", // Stores the username input
@@ -19,11 +20,12 @@ class LoginView extends React.Component {
   }
 
   componentDidMount() {
-    // Check if there are stored credentials in localStorage
+    // Check if there are stored credentials in localStorage when the component mounts
     const storedUsername = localStorage.getItem('username');
     const storedPassword = localStorage.getItem('password');
     const storedRememberMe = localStorage.getItem('remember_me');
 
+    // If stored credentials are found, populate the form fields
     if (storedUsername && storedPassword && storedRememberMe) {
       this.setState({
         user_input: {
@@ -35,6 +37,7 @@ class LoginView extends React.Component {
     }
   }
 
+  // Handler for updating state when text fields change
   QGetTextFromField = (e) => {
     this.setState({
       user_input: {
@@ -44,6 +47,7 @@ class LoginView extends React.Component {
     });
   }
 
+  // Handler for toggling the "remember me" checkbox
   QToggleCheckbox = (e) => {
     this.setState({
       user_input: {
@@ -53,6 +57,7 @@ class LoginView extends React.Component {
     });
   }
 
+  // Handler for submitting the login form
   QPostLogin = async () => {
     const { username, password, remember_me } = this.state.user_input;
 
@@ -63,6 +68,7 @@ class LoginView extends React.Component {
     }
 
     try {
+      // Make a POST request to the login API endpoint
       const response = await axios.post(`${API_URL}/users/login`, { username, password });
 
       if (response.status === 200) {
@@ -86,7 +92,7 @@ class LoginView extends React.Component {
       }
     } catch (err) {
       this.setState({ status: { success: false, msg: "An error occurred. Please try again." } });
-      console.error(err);
+      console.error(err); // Log error details for debugging
     }
   }
 
@@ -125,8 +131,6 @@ class LoginView extends React.Component {
               type="checkbox"
               id="rememberMe"
               name="remember_me"
-              backgroundcolor="#003f5c"
-              bordercolor="#003f5c"
               onChange={this.QToggleCheckbox}
               checked={user_input.remember_me}
             />
@@ -135,14 +139,16 @@ class LoginView extends React.Component {
             </label>
           </div>
         </form>
+        {/* Button to submit the login form */}
         <button
-              style={{ marginTop: "10px", backgroundColor: '#003f5c', borderColor: '#003f5c' }}
-              onClick={this.QPostLogin}
-              className="btn btn-primary"
-            >
-              Log In
+          style={{ marginTop: "10px", backgroundColor: '#003f5c', borderColor: '#003f5c' }}
+          onClick={this.QPostLogin}
+          className="btn btn-primary"
+        >
+          Log In
         </button>
 
+        {/* Display status messages based on login attempt result */}
         {status.success === true && status.msg && (
           <p className="alert alert-success" role="alert">
             {status.msg}
