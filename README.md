@@ -3,13 +3,12 @@
   <img src="https://img.shields.io/badge/Backend-Node.js-green?style=flat-square&logo=node.js" />
   <img src="https://img.shields.io/badge/Runtime-JavaScript-yellow?style=flat-square&logo=javascript" />
   <img src="https://img.shields.io/badge/Database-MySQL-orange?style=flat-square&logo=mysql" />
-  <img src="https://img.shields.io/badge/Architecture-FullStack-informational?style=flat-square" />
+  <img src="https://img.shields.io/badge/Architecture-FullStack-darkblue?style=flat-square" />
   <img src="https://img.shields.io/badge/Status-Completed-success?style=flat-square" />
-  <img src="https://img.shields.io/badge/Project-Systems%20III-purple?style=flat-square" />
+  <img src="https://img.shields.io/badge/Project-BookFlow-purple?style=flat-square" />
 </p>
 
-# 📚 BookFlow  
-### Information System – Systems III Project  
+# 📚 BookFlow
 
 ## 📖 Project Overview
 
